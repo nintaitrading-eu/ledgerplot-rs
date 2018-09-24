@@ -1,0 +1,7 @@
+[package]
+name = "ledgerplot"
+version = "0.1.0"
+authors = ["Andy Nagels <thereisanewway@gmail.com>"]
+
+[dependencies]
+docopt = "1"
