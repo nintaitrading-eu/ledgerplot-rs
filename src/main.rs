@@ -2,6 +2,7 @@ extern crate docopt;
 
 use docopt::Docopt;
 
+const VERSION: &'static str = "0.1.0";
 const USAGE: &'static str = "
 Ledgerplot.
 
@@ -29,6 +30,13 @@ fn main()
     let args = Docopt::new(USAGE)
         .and_then(|dopt| dopt.parse())
         .unwrap_or_else(|e| e.exit());
-    
-    print!("TBD");
+
+    if args.get_bool("--version")
+    {
+        println!("Ledgerplot v{}", VERSION);
+    }
+    else
+    {
+        println!("TBD");
+    }
 }
