@@ -3,15 +3,25 @@ extern crate docopt;
 use docopt::Docopt;
 
 const USAGE: &'static str = "
-ledgerplot
+Ledgerplot.
 
 Usage:
-  ledgerplot (-h | --help)
-  ledgerplot --version
+    ledgerplot --file=<file_name> --startyear=<year_start> --endyear=<year_end> [--income_vs_expenses|--income_per_category|--expenses_per_category] [--yearly|--monthly|--weekly]
+    ledgerplot --help
+    ledgerplot --version
 
 Options:
-  -h --help  Show usage info.
-  --version  Show version.
+    --file=<file_name>          Ledger dat filename to use.
+    --startyear=<year_start>    Plot from this year.
+    --endyear=<year_end>        Plot until this year (inclusive).
+    --income_vs_expenses        Plot income vs expenses.
+    --income_per_category       Plot income per category.
+    --expenses_per_category     Plot expenses per category.
+    --yearly                    Plot totals per year.
+    --monthly                   Plot totals per month.
+    --weekly                    Plot totals per week.
+    -h --help                   Show this screen.
+    --version                   Show version.
 ";
 
 fn main()
