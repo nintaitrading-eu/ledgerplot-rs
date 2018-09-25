@@ -5,3 +5,4 @@ authors = ["Andy Nagels <thereisanewway@gmail.com>"]
 
 [dependencies]
 docopt = "1"
+gnuplot = "0.0.26"
