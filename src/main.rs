@@ -39,4 +39,5 @@ fn main()
     {
         println!("TBD");
     }
+    std::process::exit(0);
 }
