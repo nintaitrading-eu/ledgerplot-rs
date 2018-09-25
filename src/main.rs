@@ -37,7 +37,28 @@ fn main()
     }
     else
     {
-        println!("TBD");
+        let file = args.get_str("--file");
+        if file.len() > 0
+        {
+            prepare_data(file);
+	    plot_data();
+	    cleanup(); // Remove temporary files
+        }
     }
     std::process::exit(0);
+}
+
+fn prepare_data(afile: &str)
+{
+    println!("TEST - prepare_data: {}", afile);
+}
+
+fn plot_data()
+{
+    println!("TEST - plot_data");
+}
+
+fn cleanup()
+{
+    println!("TEST - cleanup");
 }
