@@ -7,7 +7,7 @@ const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --startyear=<year_start> --endyear=<year_end> [--income_vs_expenses|--income_per_category|--expenses_per_category] [--yearly|--monthly|--weekly]
+    ledgerplot --file=<file_name> --startyear=<year_start> --endyear=<year_end> [--type=<income_vs_expenses|income_per_category|expenses_per_category|wealthgrowth>] [--yearly|--monthly|--weekly]
     ledgerplot --help
     ledgerplot --version
 
@@ -15,9 +15,7 @@ Options:
     --file=<file_name>          Ledger dat filename to use.
     --startyear=<year_start>    Plot from this year.
     --endyear=<year_end>        Plot until this year (inclusive).
-    --income_vs_expenses        Plot income vs expenses.
-    --income_per_category       Plot income per category.
-    --expenses_per_category     Plot expenses per category.
+    --type=<income_vs_expenses|income_per_category|expenses_per_category|wealthgrowth>                          Create the given plot type.
     --yearly                    Plot totals per year.
     --monthly                   Plot totals per month.
     --weekly                    Plot totals per week.
@@ -40,6 +38,8 @@ fn main()
         let file = args.get_str("--file");
         if file.len() > 0
         {
+	    let plot_type = args.get_str("--type");
+	    println!("Plot type = {}", plot_type);
             prepare_data(file);
 	    plot_data();
 	    cleanup(); // Remove temporary files
