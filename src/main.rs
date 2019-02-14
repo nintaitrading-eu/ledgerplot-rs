@@ -1,6 +1,10 @@
 extern crate docopt;
 
 use docopt::Docopt;
+use enums::{PlotType};
+
+#[macro_use]
+pub mod enums;
 
 const VERSION: &'static str = "0.1.0";
 const USAGE: &'static str = "
@@ -40,6 +44,11 @@ fn main()
         {
 	    let plot_type = args.get_str("--type");
 	    println!("Plot type = {}", plot_type);
+	    if plot_type == "income_vs_expenses"
+	    {
+	      let plot_type_enum = enums::PlotType::IncomeVsExpenses;
+	      println!("PlotType enum = {:?}", enums::PlotType::IncomeVsExpenses);
+	    }
             prepare_data(file);
 	    plot_data();
 	    cleanup(); // Remove temporary files
