@@ -1,5 +1,13 @@
 use std::str::FromStr;
 
+#[derive(Debug, PartialEq)]
+pub enum PlotType
+{
+  IncomeVsExpenses,
+  IncomePerCategory,
+  ExpensesPerCategory,
+  WealthGrowth
+}
 
 /*impl PlotType
 {
@@ -15,4 +23,21 @@ use std::str::FromStr;
     }
 }*/
 
+
+impl FromStr for PlotType
+{
+    type Err = ();
+
+    fn from_str(a_str: &str) -> Result<Self, Self::Err>
+    {
+        match a_str
+        {
+            "IncomeVsExpenses" => Ok(PlotType::IncomeVsExpenses),
+            "IncomePerCategory" => Ok(PlotType::IncomePerCategory),
+            "ExpensesPerCategory" => Ok(PlotType::ExpensesPerCategory),
+            "WealthGrowth" => Ok(PlotType::WealthGrowth),
+            _ => Err(()),
+        }
+    }
+}
 
