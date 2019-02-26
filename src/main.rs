@@ -1,7 +1,8 @@
 extern crate docopt;
 
 use docopt::Docopt;
-use enums::{PlotType};
+//use enums::{PlotType};
+use std::str::FromStr;
 
 #[macro_use]
 pub mod enums;
@@ -11,7 +12,7 @@ const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --startyear=<year_start> --endyear=<year_end> [--type=<income_vs_expenses|income_per_category|expenses_per_category|wealthgrowth>] [--yearly|--monthly|--weekly]
+    ledgerplot --file=<file_name> --startyear=<year_start> --endyear=<year_end> [--type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|wealthgrowth>] [--yearly|--monthly|--weekly]
     ledgerplot --help
     ledgerplot --version
 
@@ -19,13 +20,39 @@ Options:
     --file=<file_name>          Ledger dat filename to use.
     --startyear=<year_start>    Plot from this year.
     --endyear=<year_end>        Plot until this year (inclusive).
-    --type=<income_vs_expenses|income_per_category|expenses_per_category|wealthgrowth>                          Create the given plot type.
+    --type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|Wealthgrowth>                          Create the given plot type.
     --yearly                    Plot totals per year.
     --monthly                   Plot totals per month.
     --weekly                    Plot totals per week.
     -h --help                   Show this screen.
     --version                   Show version.
 ";
+
+#[derive(Debug, PartialEq)]
+pub enum PlotType
+{
+  IncomeVsExpenses,
+  IncomePerCategory,
+  ExpensesPerCategory,
+  WealthGrowth
+}
+
+impl FromStr for PlotType
+{
+    type Err = ();
+
+    fn from_str(a_str: &str) -> Result<Self, Self::Err>
+    {
+        match a_str
+        {
+            "IncomeVsExpenses" => Ok(PlotType::IncomeVsExpenses),
+            "IncomePerCategory" => Ok(PlotType::IncomePerCategory),
+            "ExpensesPerCategory" => Ok(PlotType::ExpensesPerCategory),
+            "WealthGrowth" => Ok(PlotType::WealthGrowth),
+            _ => Err(()),
+        }
+    }
+}
 
 fn main()
 {
@@ -42,24 +69,30 @@ fn main()
         let file = args.get_str("--file");
         if file.len() > 0
         {
-	    let plot_type = args.get_str("--type");
-	    println!("Plot type = {}", plot_type);
-	    if plot_type == "income_vs_expenses"
-	    {
-	      let plot_type_enum = enums::PlotType::IncomeVsExpenses;
-	      println!("PlotType enum = {:?}", enums::PlotType::IncomeVsExpenses);
-	    }
-            prepare_data(file);
-	    plot_data();
-	    cleanup(); // Remove temporary files
+            //let plot_type = enums::PlotType::from_str(args.get_str("--type"));
+            let plot_type = PlotType::from_str(args.get_str("--type"));
+            match plot_type
+            {
+                Ok(pt) => prepare_data(file, pt),
+                Err(e) => println!("Error parsing plot type: {:?}", e),
+            }
+            
+            plot_data();
+            cleanup(); // Remove temporary files
         }
     }
     std::process::exit(0);
 }
 
-fn prepare_data(afile: &str)
+//fn prepare_data(afile: &str, aplot_type: enums::PlotType)
+fn prepare_data(afile: &str, aplot_type: PlotType)
 {
-    println!("TEST - prepare_data: {}", afile);
+    //if aplot_type == enums::PlotType::IncomeVsExpenses
+    if aplot_type == PlotType::IncomeVsExpenses
+    {
+      println!("PlotType enum = {:?}", aplot_type);
+    }
+    println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
 }
 
 fn plot_data()
