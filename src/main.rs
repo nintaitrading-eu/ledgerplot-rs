@@ -1,10 +1,10 @@
 extern crate docopt;
 
-use docopt::Docopt;
-use enums::{PlotType};
+//#[macro_use]
+mod enums;
 
-#[macro_use]
-pub mod enums;
+use docopt::Docopt;
+use enums::plot;
 
 const VERSION: &'static str = "0.1.0";
 const USAGE: &'static str = "
@@ -42,7 +42,7 @@ fn main()
         let file = args.get_str("--file");
         if file.len() > 0
         {
-            let plot_type = enums::PlotType::from_str(args.get_str("--type"));
+            let plot_type = args.get_str("--type").parse::<plot::PlotType>();
             match plot_type
             {
                 Ok(pt) => prepare_data(file, pt),
@@ -56,9 +56,9 @@ fn main()
     std::process::exit(0);
 }
 
-fn prepare_data(afile: &str, aplot_type: enums::PlotType)
+fn prepare_data(afile: &str, aplot_type: plot::PlotType)
 {
-    if aplot_type == enums::PlotType::IncomeVsExpenses
+    if aplot_type == plot::PlotType::IncomeVsExpenses
     {
       println!("PlotType enum = {:?}", aplot_type);
     }
