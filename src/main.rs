@@ -26,6 +26,9 @@ Options:
     -h --help                   Show this screen.
     --version                   Show version.
 ";
+const CMD_INCOMEVSEXPENSES_INCOME: &'static str = "ledger -f %s --strict -j reg --real -X EUR -H ^income %s --collapse --plot-amount-format=\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
+const CMD_INCOMEVSEXPENSES_EXPENSES: &'static str = "ledger -f %s --strict -j reg --real -X EUR -H ^expenses %s --collapse";
+const CMD_INCOMEVSEXPENSES_PLOT: &'static str = "plot for [COL=STARTCOL:ENDCOL] '%s' u COL:xtic(1) w histogram title columnheader(COL) lc rgb word(COLORS, COL-STARTCOL+1), for [COL=STARTCOL:ENDCOL] '%s' u (column(0)+BOXWIDTH*(COL-STARTCOL+GAPSIZE/2+1)-1.0):COL:COL notitle w labels textcolor rgb \"#839496\"";
 
 fn main()
 {
@@ -58,11 +61,11 @@ fn main()
 
 fn prepare_data(afile: &str, aplot_type: plot::PlotType)
 {
+    println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
     if aplot_type == plot::PlotType::IncomeVsExpenses
     {
       println!("PlotType enum = {:?}", aplot_type);
     }
-    println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
 }
 
 fn plot_data()
