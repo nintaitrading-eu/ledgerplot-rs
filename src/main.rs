@@ -30,10 +30,10 @@ Options:
     -h --help                   Show this screen.
     --version                   Show version.
 ";
-const CMD_INCOMEVSEXPENSES_INCOME: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^income {period} --collapse --plot-amount-format=\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
+//const CMD_INCOMEVSEXPENSES_INCOME: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^income {period} --collapse --plot-amount-format=\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
 const PLOT_AMOUNT_FORMAT: &'static str = "\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))";
-const CMD_INCOMEVSEXPENSES_EXPENSES: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^expenses {period} --collapse";
-const CMD_INCOMEVSEXPENSES_PLOT: &'static str = "plot for [COL=STARTCOL:ENDCOL] '{data_income}' u COL:xtic(1) w histogram title columnheader(COL) lc rgb word(COLORS, COL-STARTCOL+1), for [COL=STARTCOL:ENDCOL] '{data_expenses}' u (column(0)+BOXWIDTH*(COL-STARTCOL+GAPSIZE/2+1)-1.0):COL:COL notitle w labels textcolor rgb \"#839496\"";
+//const CMD_INCOMEVSEXPENSES_EXPENSES: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^expenses {period} --collapse";
+//const CMD_INCOMEVSEXPENSES_PLOT: &'static str = "plot for [COL=STARTCOL:ENDCOL] '{data_income}' u COL:xtic(1) w histogram title columnheader(COL) lc rgb word(COLORS, COL-STARTCOL+1), for [COL=STARTCOL:ENDCOL] '{data_expenses}' u (column(0)+BOXWIDTH*(COL-STARTCOL+GAPSIZE/2+1)-1.0):COL:COL notitle w labels textcolor rgb \"#839496\"";
 
 fn main() -> Result<(), Error>
 {
