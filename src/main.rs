@@ -102,35 +102,43 @@ fn main() -> Result<(), Error>
 fn prepare_data(afile: &str, aplot_type: plot::PlotType, astartyear: i32, aendyear: i32) -> Result<bool, Error>
 {
     println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
+    let mut path: &str = "./";
+    let mut output: std::vec::Vec<u8> = std::vec::Vec::<u8>::new();
     if aplot_type == plot::PlotType::IncomeVsExpenses
     {
-      println!("PlotType enum = {:?}", aplot_type);
-      let output = Command::new("ledger")
-          .arg("-f")
-          .arg(afile)
-          .arg("--strict")
-          .arg("-j")
-          .arg("reg")
-          .arg("--real")
-          .arg("-X")
-          .arg("EUR")
-          .arg("-H")
-          .arg("^income")
-          .arg("-b")
-          .arg(astartyear.to_string())
-          .arg("-e")
-          .arg(aendyear.to_string())
-          .arg("--collapse")
-          .arg("--plot-amount-format")
-          .arg(PLOT_AMOUNT_FORMAT)
-          .output()
-          .expect("Failed to execute ledger command.");
-        let path = "income_vs_expenses.tmp";
-        let mut output_string = String::from_utf8(output.stdout).unwrap();
-        let mut output_file = File::create(path)?;
-        writeln!(&mut output_file, "{}", output_string);
+        println!("PlotType enum = {:?}", aplot_type);
+        output = Command::new("ledger")
+            .arg("-f")
+            .arg(afile)
+            .arg("--strict")
+            .arg("-j")
+            .arg("reg")
+            .arg("--real")
+            .arg("-X")
+            .arg("EUR")
+            .arg("-H")
+            .arg("^income")
+            .arg("-b")
+            .arg(astartyear.to_string())
+            .arg("-e")
+            .arg(aendyear.to_string())
+            .arg("--collapse")
+            .arg("--plot-amount-format")
+            .arg(PLOT_AMOUNT_FORMAT)
+            .output()
+            .expect("Failed to execute ledger command.")
+            .stdout;
+        path = "income_vs_expenses.tmp";
+        //let mut output_string = String::from_utf8(output.stdout).unwrap();
+        //println!("{}", output_string);
+        // output_file.write_all(&output.stdout).unwrap();
     }
-    Ok(true)
+    let mut output_file = File::create(path)?;
+    match output_file.write_all(&output)
+    {
+        Ok(_) => Ok(true),
+        Err(e) => Err(e)
+    }
 }
 
 fn plot_data()
