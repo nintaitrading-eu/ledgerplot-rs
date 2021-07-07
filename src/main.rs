@@ -5,7 +5,10 @@ mod enums;
 
 use docopt::Docopt;
 use enums::plot;
+use std::io::{Write, Error};
+use std::fs::File;
 use std::process::Command;
+use std::path::Path;
 
 const VERSION: &'static str = "0.1.0";
 const USAGE: &'static str = "
@@ -28,10 +31,11 @@ Options:
     --version                   Show version.
 ";
 const CMD_INCOMEVSEXPENSES_INCOME: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^income {period} --collapse --plot-amount-format=\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
+const PLOT_AMOUNT_FORMAT: &'static str = "\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))";
 const CMD_INCOMEVSEXPENSES_EXPENSES: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^expenses {period} --collapse";
 const CMD_INCOMEVSEXPENSES_PLOT: &'static str = "plot for [COL=STARTCOL:ENDCOL] '{data_income}' u COL:xtic(1) w histogram title columnheader(COL) lc rgb word(COLORS, COL-STARTCOL+1), for [COL=STARTCOL:ENDCOL] '{data_expenses}' u (column(0)+BOXWIDTH*(COL-STARTCOL+GAPSIZE/2+1)-1.0):COL:COL notitle w labels textcolor rgb \"#839496\"";
 
-fn main()
+fn main() -> Result<(), Error>
 {
     let args = Docopt::new(USAGE)
         .and_then(|dopt| dopt.parse())
@@ -40,42 +44,93 @@ fn main()
     if args.get_bool("--version")
     {
         println!("Ledgerplot v{}", VERSION);
-    }
-    else
+        std::process::exit(0);
+    };
+
+    let file = args.get_str("--file");
+    if !(file.len() > 0) || !Path::new(file).exists()
     {
-        let file = args.get_str("--file");
-        if file.len() > 0
+        println!("File {} not found.", file);
+        std::process::exit(1);
+    };
+
+    let startyear = match args.get_str("--startyear").parse::<i32>()
+    {
+        Ok(num) => num,
+        Err(_) =>
         {
-            let plot_type = args.get_str("--type").parse::<plot::PlotType>();
-            match plot_type
-            {
-                Ok(pt) => prepare_data(file, pt),
-                Err(e) => println!("Error parsing plot type: {:?}", e),
-            }
-            
-            plot_data();
-            cleanup(); // Remove temporary files
+            println!("Invalid startyear {}.", args.get_str("--startyear"));
+            std::process::exit(1);
         }
-    }
+    };
+
+    let endyear = match args.get_str("--endyear").parse::<i32>()
+    {
+        Ok(num) => num,
+        Err(_) =>
+        {
+            println!("Invalid endyear {}.", args.get_str("--endyear"));
+            std::process::exit(1);
+        }
+    };
+
+    let plot_type = match args.get_str("--type").parse::<plot::PlotType>()
+    {
+        Ok(pt) => pt,
+        Err(e) =>
+        {
+            println!("Error parsing plot type: {:?}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let is_prepared = match prepare_data(file, plot_type, startyear, endyear)
+    {
+        Ok(res) => res,
+        Err(e) =>
+        {
+            println!("Error: data could not be prepared: {:?}", e);
+            std::process::exit(1);
+        }
+    };
+
+    plot_data();
+    cleanup(); // Remove temporary files
     std::process::exit(0);
 }
 
-fn prepare_data(afile: &str, aplot_type: plot::PlotType)
+fn prepare_data(afile: &str, aplot_type: plot::PlotType, astartyear: i32, aendyear: i32) -> Result<bool, Error>
 {
     println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
     if aplot_type == plot::PlotType::IncomeVsExpenses
     {
       println!("PlotType enum = {:?}", aplot_type);
-      // TODO: period must be a parameter
-      // TODO: The below does not work.
-      let output = Command::new(format!(CMD_INCOMEVSEXPENSES_INCOME, file=afile, period="--startyear=2014 --endyear=2019"))
-          //.arg("Hello world")
+      let output = Command::new("ledger")
+          .arg("-f")
+          .arg(afile)
+          .arg("--strict")
+          .arg("-j")
+          .arg("reg")
+          .arg("--real")
+          .arg("-X")
+          .arg("EUR")
+          .arg("-H")
+          .arg("^income")
+          .arg("-b")
+          .arg(astartyear.to_string())
+          .arg("-e")
+          .arg(aendyear.to_string())
+          .arg("--collapse")
+          .arg("--plot-amount-format")
+          .arg(PLOT_AMOUNT_FORMAT)
           .output()
           .expect("Failed to execute ledger command.");
-      println!("After command");
-      assert_eq!(b"Hello world\n", output.stdout.as_slice());
-      println!("After2 command");
+        let path = "income_vs_expenses.tmp";
+        let mut output_string = String::from_utf8(output.stdout).unwrap();
+        let mut output_file = File::create(path)?;
+        writeln!(&mut output_file, "{}", output_string);
     }
+    Ok(true)
 }
 
 fn plot_data()
