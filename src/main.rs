@@ -31,7 +31,8 @@ Options:
     --version                   Show version.
 ";
 //const CMD_INCOMEVSEXPENSES_INCOME: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^income {period} --collapse --plot-amount-format=\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
-const PLOT_AMOUNT_FORMAT: &'static str = "\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))";
+const PLOT_AMOUNT_FORMAT: &'static str =
+    "\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))";
 //const CMD_INCOMEVSEXPENSES_EXPENSES: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^expenses {period} --collapse";
 //const CMD_INCOMEVSEXPENSES_PLOT: &'static str = "plot for [COL=STARTCOL:ENDCOL] '{data_income}' u COL:xtic(1) w histogram title columnheader(COL) lc rgb word(COLORS, COL-STARTCOL+1), for [COL=STARTCOL:ENDCOL] '{data_expenses}' u (column(0)+BOXWIDTH*(COL-STARTCOL+GAPSIZE/2+1)-1.0):COL:COL notitle w labels textcolor rgb \"#839496\"";
 
@@ -99,7 +100,12 @@ fn main() -> Result<(), Error>
     std::process::exit(0);
 }
 
-fn prepare_data(afile: &str, aplot_type: plot::PlotType, astartyear: i32, aendyear: i32) -> Result<bool, Error>
+fn prepare_data(
+    afile: &str,
+    aplot_type: plot::PlotType,
+    astartyear: i32,
+    aendyear: i32,
+) -> Result<bool, Error>
 {
     println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
     let mut path: &str = "./";
@@ -137,7 +143,7 @@ fn prepare_data(afile: &str, aplot_type: plot::PlotType, astartyear: i32, aendye
     match output_file.write_all(&output)
     {
         Ok(_) => Ok(true),
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
 

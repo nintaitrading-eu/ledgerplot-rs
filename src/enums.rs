@@ -5,10 +5,10 @@ pub mod plot
     #[derive(Debug, PartialEq)]
     pub enum PlotType
     {
-      IncomeVsExpenses,
-      IncomePerCategory,
-      ExpensesPerCategory,
-      WealthGrowth,
+        IncomeVsExpenses,
+        IncomePerCategory,
+        ExpensesPerCategory,
+        WealthGrowth,
     }
 
     /*impl PlotType
