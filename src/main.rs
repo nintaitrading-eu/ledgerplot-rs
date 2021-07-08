@@ -30,8 +30,8 @@ Options:
     -h --help                   Show this screen.
     --version                   Show version.
 ";
-const PLOT_AMOUNT_FORMAT: &'static str =
-    "%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
+const PLOT_TOTAL_FORMAT: &'static str =
+    "%(format_date(date, \"%Y-%m-%d\")) %(roundto(scrub(display_amount), 10))\n";
 
 fn main() -> Result<(), Error>
 {
@@ -115,20 +115,21 @@ fn prepare_data(
             .arg("-f")
             .arg(afile)
             .arg("--strict")
-            .arg("-j")
-            .arg("reg")
-            .arg("--real")
             .arg("-X")
             .arg("EUR")
-            .arg("-H")
-            .arg("^income")
+            .arg("--real")
+            .arg("-J")
+            .arg("reg")
+            .arg("income")
+            .arg("-Y")
+            .arg("--collapse")
+            .arg("--no-rounding")
+            .arg("--plot-total-format")
+            .arg(PLOT_TOTAL_FORMAT)
             .arg("-b")
             .arg(astartyear.to_string())
             .arg("-e")
-            .arg(aendyear.to_string())
-            .arg("--collapse")
-            .arg("--plot-amount-format")
-            .arg(PLOT_AMOUNT_FORMAT)
+            .arg((aendyear + 1).to_string())
             .output()
             .expect("Failed to execute ledger command for output1.")
             .stdout;
@@ -136,20 +137,21 @@ fn prepare_data(
             .arg("-f")
             .arg(afile)
             .arg("--strict")
-            .arg("-j")
-            .arg("reg")
-            .arg("--real")
             .arg("-X")
             .arg("EUR")
-            .arg("-H")
-            .arg("^expenses")
+            .arg("--real")
+            .arg("-J")
+            .arg("reg")
+            .arg("expenses")
+            .arg("-Y")
+            .arg("--collapse")
+            .arg("--no-rounding")
+            .arg("--plot-total-format")
+            .arg(PLOT_TOTAL_FORMAT)
             .arg("-b")
             .arg(astartyear.to_string())
             .arg("-e")
-            .arg(aendyear.to_string())
-            .arg("--collapse")
-            .arg("--plot-amount-format")
-            .arg(PLOT_AMOUNT_FORMAT)
+            .arg((aendyear + 1).to_string())
             .output()
             .expect("Failed to execute ledger command for output2.")
             .stdout;
