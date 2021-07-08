@@ -32,7 +32,6 @@ Options:
 ";
 const PLOT_AMOUNT_FORMAT: &'static str =
     "%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
-//const CMD_INCOMEVSEXPENSES_PLOT: &'static str = "plot for [COL=STARTCOL:ENDCOL] '{data_income}' u COL:xtic(1) w histogram title columnheader(COL) lc rgb word(COLORS, COL-STARTCOL+1), for [COL=STARTCOL:ENDCOL] '{data_expenses}' u (column(0)+BOXWIDTH*(COL-STARTCOL+GAPSIZE/2+1)-1.0):COL:COL notitle w labels textcolor rgb \"#839496\"";
 
 fn main() -> Result<(), Error>
 {
@@ -154,8 +153,8 @@ fn prepare_data(
             .output()
             .expect("Failed to execute ledger command for output2.")
             .stdout;
-        path1 = "income_vs_expenses1.tmp";
-        path2 = "income_vs_expenses2.tmp";
+        path1 = "/var/tmp/ledgerplot/ledgeroutput1.tmp";
+        path2 = "/var/tmp/ledgerplot/ledgeroutput2.tmp";
     }
     let mut output_file1 = File::create(path1)?;
     let mut result: std::result::Result<bool, Error> = match output_file1.write_all(&output1)
@@ -164,13 +163,20 @@ fn prepare_data(
         Err(e) => return Err(e),
     };
 
-    // TODO: if err: return already?
     let mut output_file2 = File::create(path2)?;
-    match output_file2.write_all(&output2)
+    result = match output_file2.write_all(&output2)
     {
         Ok(_) => Ok(true),
-        Err(e) => Err(e),
-    }
+        Err(e) => return Err(e),
+    };
+    result = match Command::new("gnuplot")
+        .arg("/usr/local/share/ledgerplot/gp_income_vs_expenses.gnu")
+        .status()
+    {
+        Ok(_) => Ok(true),
+        Err(e) => Err(e)
+    };
+    result
 }
 
 fn plot_data()
