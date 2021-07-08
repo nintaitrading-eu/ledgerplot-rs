@@ -109,6 +109,9 @@ fn prepare_data(
     let mut path2: &str = "./";
     let mut output1: std::vec::Vec<u8> = std::vec::Vec::<u8>::new();
     let mut output2: std::vec::Vec<u8> = std::vec::Vec::<u8>::new();
+    // TODO: Move to seperate modules
+    // TODO: separate prepare and plot steps
+    // TODO: Create /var/tmp/ledgerplot, if it does not exist
     if aplot_type == plot::PlotType::IncomeVsExpenses
     {
         output1 = Command::new("ledger")
