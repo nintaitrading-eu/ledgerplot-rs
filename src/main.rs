@@ -30,10 +30,8 @@ Options:
     -h --help                   Show this screen.
     --version                   Show version.
 ";
-//const CMD_INCOMEVSEXPENSES_INCOME: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^income {period} --collapse --plot-amount-format=\"%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
 const PLOT_AMOUNT_FORMAT: &'static str =
     "%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_amount))))\n";
-//const CMD_INCOMEVSEXPENSES_EXPENSES: &'static str = "ledger -f {file} --strict -j reg --real -X EUR -H ^expenses {period} --collapse";
 //const CMD_INCOMEVSEXPENSES_PLOT: &'static str = "plot for [COL=STARTCOL:ENDCOL] '{data_income}' u COL:xtic(1) w histogram title columnheader(COL) lc rgb word(COLORS, COL-STARTCOL+1), for [COL=STARTCOL:ENDCOL] '{data_expenses}' u (column(0)+BOXWIDTH*(COL-STARTCOL+GAPSIZE/2+1)-1.0):COL:COL notitle w labels textcolor rgb \"#839496\"";
 
 fn main() -> Result<(), Error>
@@ -108,12 +106,13 @@ fn prepare_data(
 ) -> Result<bool, Error>
 {
     println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
-    let mut path: &str = "./";
-    let mut output: std::vec::Vec<u8> = std::vec::Vec::<u8>::new();
+    let mut path1: &str = "./";
+    let mut path2: &str = "./";
+    let mut output1: std::vec::Vec<u8> = std::vec::Vec::<u8>::new();
+    let mut output2: std::vec::Vec<u8> = std::vec::Vec::<u8>::new();
     if aplot_type == plot::PlotType::IncomeVsExpenses
     {
-        println!("PlotType enum = {:?}", aplot_type);
-        output = Command::new("ledger")
+        output1 = Command::new("ledger")
             .arg("-f")
             .arg(afile)
             .arg("--strict")
@@ -132,12 +131,42 @@ fn prepare_data(
             .arg("--plot-amount-format")
             .arg(PLOT_AMOUNT_FORMAT)
             .output()
-            .expect("Failed to execute ledger command.")
+            .expect("Failed to execute ledger command for output1.")
             .stdout;
-        path = "income_vs_expenses.tmp";
+        output2 = Command::new("ledger")
+            .arg("-f")
+            .arg(afile)
+            .arg("--strict")
+            .arg("-j")
+            .arg("reg")
+            .arg("--real")
+            .arg("-X")
+            .arg("EUR")
+            .arg("-H")
+            .arg("^expenses")
+            .arg("-b")
+            .arg(astartyear.to_string())
+            .arg("-e")
+            .arg(aendyear.to_string())
+            .arg("--collapse")
+            .arg("--plot-amount-format")
+            .arg(PLOT_AMOUNT_FORMAT)
+            .output()
+            .expect("Failed to execute ledger command for output2.")
+            .stdout;
+        path1 = "income_vs_expenses1.tmp";
+        path2 = "income_vs_expenses2.tmp";
     }
-    let mut output_file = File::create(path)?;
-    match output_file.write_all(&output)
+    let mut output_file1 = File::create(path1)?;
+    let mut result: std::result::Result<bool, Error> = match output_file1.write_all(&output1)
+    {
+        Ok(_) => Ok(true),
+        Err(e) => return Err(e),
+    };
+
+    // TODO: if err: return already?
+    let mut output_file2 = File::create(path2)?;
+    match output_file2.write_all(&output2)
     {
         Ok(_) => Ok(true),
         Err(e) => Err(e),
