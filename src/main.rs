@@ -2,6 +2,7 @@ extern crate docopt;
 
 mod enums;
 mod income_vs_expenses;
+mod wealthgrowth;
 
 use docopt::Docopt;
 use enums::plot;
@@ -123,6 +124,14 @@ fn prepare_data(
             Err(e) => return Err(e),
         };
     }
+    if *aplot_type == plot::PlotType::WealthGrowth
+    {
+        match wealthgrowth::wealthgrowth::prepare_data(afile, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Err(e) => return Err(e),
+        };
+    }
     Ok(true)
 }
 
@@ -131,6 +140,14 @@ fn plot_data(aplot_type: &plot::PlotType) -> Result<bool, Error>
     if *aplot_type == plot::PlotType::IncomeVsExpenses
     {
         match income_vs_expenses::income_vs_expenses::plot_data()
+        {
+            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
+            Err(e) => return Err(e),
+        };
+    }
+    if *aplot_type == plot::PlotType::WealthGrowth
+    {
+        match wealthgrowth::wealthgrowth::plot_data()
         {
             Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
             Err(e) => return Err(e),
