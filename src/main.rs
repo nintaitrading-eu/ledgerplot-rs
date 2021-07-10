@@ -13,7 +13,7 @@ const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --startyear=<year_start> --endyear=<year_end> [--type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth>] [--yearly|--monthly|--weekly]
+    ledgerplot --file=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth> [--yearly|--monthly|--weekly]
     ledgerplot --help
     ledgerplot --version
 
@@ -47,6 +47,13 @@ fn main() -> Result<(), Error>
         println!("File {} not found.", file);
         std::process::exit(1);
     };
+
+    if args.get_bool("--yearly")
+        || args.get_bool("--monthly")
+        || args.get_bool("--weekly")
+    {
+        println!("NotImplemented: --yearly, --monthly or --weekly options.");
+    }
 
     let startyear = match args.get_str("--startyear").parse::<i32>()
     {
