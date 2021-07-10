@@ -79,9 +79,9 @@ fn main() -> Result<(), Error>
     let plot_type = match args.get_str("--type").parse::<plot::PlotType>()
     {
         Ok(pt) => pt,
-        Err(e) =>
+        Err(_) =>
         {
-            println!("Error parsing plot type: {:?}", e);
+            println!("Error parsing plot type: {}", args.get_str("--type"));
             std::process::exit(1);
         }
     };
