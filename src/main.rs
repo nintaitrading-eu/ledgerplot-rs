@@ -1,13 +1,11 @@
 extern crate docopt;
 
-//#[macro_use]
 mod enums;
+mod income_vs_expenses;
 
 use docopt::Docopt;
 use enums::plot;
-use std::io::{Write, Error};
-use std::fs::File;
-use std::process::Command;
+use std::io::Error;
 use std::path::Path;
 
 const VERSION: &'static str = "0.1.0";
@@ -30,8 +28,6 @@ Options:
     -h --help                   Show this screen.
     --version                   Show version.
 ";
-const PLOT_TOTAL_FORMAT: &'static str =
-    "%(format_date(date, \"%Y-%m-%d\")) %(roundto(scrub(display_amount), 10))\n";
 
 fn main() -> Result<(), Error>
 {
@@ -105,83 +101,20 @@ fn prepare_data(
 ) -> Result<bool, Error>
 {
     println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
-    let mut path1: &str = "./";
-    let mut path2: &str = "./";
-    let mut output1: std::vec::Vec<u8> = std::vec::Vec::<u8>::new();
-    let mut output2: std::vec::Vec<u8> = std::vec::Vec::<u8>::new();
-    // TODO: Move to seperate modules
-    // TODO: separate prepare and plot steps
-    // TODO: Create /var/tmp/ledgerplot, if it does not exist
     if aplot_type == plot::PlotType::IncomeVsExpenses
     {
-        output1 = Command::new("ledger")
-            .arg("-f")
-            .arg(afile)
-            .arg("--strict")
-            .arg("-X")
-            .arg("EUR")
-            .arg("--real")
-            .arg("-J")
-            .arg("reg")
-            .arg("income")
-            .arg("-Y")
-            .arg("--collapse")
-            .arg("--no-rounding")
-            .arg("--plot-total-format")
-            .arg(PLOT_TOTAL_FORMAT)
-            .arg("-b")
-            .arg(astartyear.to_string())
-            .arg("-e")
-            .arg((aendyear + 1).to_string())
-            .output()
-            .expect("Failed to execute ledger command for output1.")
-            .stdout;
-        output2 = Command::new("ledger")
-            .arg("-f")
-            .arg(afile)
-            .arg("--strict")
-            .arg("-X")
-            .arg("EUR")
-            .arg("--real")
-            .arg("-J")
-            .arg("reg")
-            .arg("expenses")
-            .arg("-Y")
-            .arg("--collapse")
-            .arg("--no-rounding")
-            .arg("--plot-total-format")
-            .arg(PLOT_TOTAL_FORMAT)
-            .arg("-b")
-            .arg(astartyear.to_string())
-            .arg("-e")
-            .arg((aendyear + 1).to_string())
-            .output()
-            .expect("Failed to execute ledger command for output2.")
-            .stdout;
-        path1 = "/var/tmp/ledgerplot/ledgeroutput1.tmp";
-        path2 = "/var/tmp/ledgerplot/ledgeroutput2.tmp";
+        match income_vs_expenses::income_vs_expenses::prepare_data(afile, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Err(e) => return Err(e),
+        };
+        match income_vs_expenses::income_vs_expenses::plot_data()
+        {
+            Ok(_) => println!("Data for {:?} plotted.", aplot_type),
+            Err(e) => return Err(e),
+        };
     }
-    let mut output_file1 = File::create(path1)?;
-    let mut result: std::result::Result<bool, Error> = match output_file1.write_all(&output1)
-    {
-        Ok(_) => Ok(true),
-        Err(e) => return Err(e),
-    };
-
-    let mut output_file2 = File::create(path2)?;
-    result = match output_file2.write_all(&output2)
-    {
-        Ok(_) => Ok(true),
-        Err(e) => return Err(e),
-    };
-    result = match Command::new("gnuplot")
-        .arg("/usr/local/share/ledgerplot/gp_income_vs_expenses.gnu")
-        .status()
-    {
-        Ok(_) => Ok(true),
-        Err(e) => Err(e)
-    };
-    result
+    Ok(true)
 }
 
 fn plot_data()
