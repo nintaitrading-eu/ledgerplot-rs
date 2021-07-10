@@ -1,5 +1,5 @@
 set terminal pngcairo size 1920,1080 enhanced font 'Inconsolata,10'
-  set output '/var/tmp/ledgerplot/yearly_income_vs_expenses.png'
+  set output 'yearly_income_vs_expenses.png'
   set style data histogram
   set style histogram clustered gap 1
   set style fill transparent solid 0.4 noborder
