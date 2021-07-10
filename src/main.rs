@@ -78,7 +78,7 @@ fn main() -> Result<(), Error>
         }
     };
 
-    let is_prepared = match prepare_data(file, plot_type, startyear, endyear)
+    let is_prepared = match prepare_data(file, &plot_type, startyear, endyear)
     {
         Ok(res) => res,
         Err(e) =>
@@ -88,41 +88,51 @@ fn main() -> Result<(), Error>
         }
     };
 
-    plot_data();
+    match plot_data(&plot_type)
+    {
+        Ok(res) => res,
+        Err(e) =>
+        {
+            println!("Error: data could not be plotted: {:?}", e);
+            std::process::exit(1);
+        }
+    };
     cleanup(); // Remove temporary files
     std::process::exit(0);
 }
 
 fn prepare_data(
     afile: &str,
-    aplot_type: plot::PlotType,
+    aplot_type: &plot::PlotType,
     astartyear: i32,
     aendyear: i32,
 ) -> Result<bool, Error>
 {
-    println!("TEST - prepare_data: {} for plot {:?}", afile, aplot_type);
-    if aplot_type == plot::PlotType::IncomeVsExpenses
+    if *aplot_type == plot::PlotType::IncomeVsExpenses
     {
         match income_vs_expenses::income_vs_expenses::prepare_data(afile, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", aplot_type),
             Err(e) => return Err(e),
         };
+    }
+    Ok(true)
+}
+
+fn plot_data(aplot_type: &plot::PlotType) -> Result<bool, Error>
+{
+    if *aplot_type == plot::PlotType::IncomeVsExpenses
+    {
         match income_vs_expenses::income_vs_expenses::plot_data()
         {
-            Ok(_) => println!("Data for {:?} plotted.", aplot_type),
+            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
             Err(e) => return Err(e),
         };
     }
     Ok(true)
 }
 
-fn plot_data()
-{
-    println!("TEST - plot_data");
-}
-
 fn cleanup()
 {
-    println!("TEST - cleanup");
+    println!("NotImplemented: Cleanup.");
 }
