@@ -96,7 +96,7 @@ fn main() -> Result<(), Error>
         }
     };
 
-    match plot_data(&plot_type)
+    match plot_data(&plot_type, startyear, endyear)
     {
         Ok(res) => res,
         Err(e) =>
@@ -135,7 +135,7 @@ fn prepare_data(
     Ok(true)
 }
 
-fn plot_data(aplot_type: &plot::PlotType) -> Result<bool, Error>
+fn plot_data(aplot_type: &plot::PlotType, astartyear: i32, aendyear: i32) -> Result<bool, Error>
 {
     if *aplot_type == plot::PlotType::IncomeVsExpenses
     {
@@ -147,7 +147,7 @@ fn plot_data(aplot_type: &plot::PlotType) -> Result<bool, Error>
     }
     if *aplot_type == plot::PlotType::WealthGrowth
     {
-        match wealthgrowth::wealthgrowth::plot_data()
+        match wealthgrowth::wealthgrowth::plot_data(astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
             Err(e) => return Err(e),
