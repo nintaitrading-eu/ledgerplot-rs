@@ -14,12 +14,13 @@ const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth> [--yearly|--monthly|--weekly]
+    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth> [--yearly|--monthly|--weekly]
     ledgerplot --help
     ledgerplot --version
 
 Options:
-    --file=<file_name>          Ledger dat filename to use.
+    --file=<file_name>          Ledger dat file to use.
+    --pricedb=<file_name>       Price database file to use.
     --startyear=<year_start>    Plot from this year.
     --endyear=<year_end>        Plot until this year (inclusive).
     --type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth>                          Create the given plot type.
@@ -46,6 +47,13 @@ fn main() -> Result<(), Error>
     if !(file.len() > 0) || !Path::new(file).exists()
     {
         println!("File {} not found.", file);
+        std::process::exit(1);
+    };
+
+    let pricedb = args.get_str("--pricedb");
+    if !(pricedb.len() > 0) || !Path::new(pricedb).exists()
+    {
+        println!("Price database {} not found.", pricedb);
         std::process::exit(1);
     };
 
@@ -86,7 +94,7 @@ fn main() -> Result<(), Error>
         }
     };
 
-    let is_prepared = match prepare_data(file, &plot_type, startyear, endyear)
+    match prepare_data(file, pricedb, &plot_type, startyear, endyear)
     {
         Ok(res) => res,
         Err(e) =>
@@ -111,6 +119,7 @@ fn main() -> Result<(), Error>
 
 fn prepare_data(
     afile: &str,
+    apricedb: &str,
     aplot_type: &plot::PlotType,
     astartyear: i32,
     aendyear: i32,
@@ -126,7 +135,7 @@ fn prepare_data(
     }
     if *aplot_type == plot::PlotType::WealthGrowth
     {
-        match wealthgrowth::wealthgrowth::prepare_data(afile, astartyear, aendyear)
+        match wealthgrowth::wealthgrowth::prepare_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", aplot_type),
             Err(e) => return Err(e),

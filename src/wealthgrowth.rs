@@ -9,6 +9,7 @@ pub mod wealthgrowth
 
     pub fn prepare_data(
         afile: &str,
+        apricedb: &str,
         astartyear: i32,
         aendyear: i32,
     ) -> Result<bool, Error>
@@ -20,7 +21,7 @@ pub mod wealthgrowth
             .arg("-f")
             .arg(afile)
             .arg("--price-db")
-            .arg("/home/rockwolf/doc/ledger-personal/prices.db")
+            .arg(apricedb)
             .arg("--strict")
             .arg("-X")
             .arg("EUR")
@@ -41,7 +42,7 @@ pub mod wealthgrowth
             .arg("-f")
             .arg(afile)
             .arg("--price-db")
-            .arg("/home/rockwolf/doc/ledger-personal/prices.db")
+            .arg(apricedb)
             .arg("--strict")
             .arg("-X")
             .arg("EUR")
