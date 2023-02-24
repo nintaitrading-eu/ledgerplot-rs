@@ -7,7 +7,10 @@ mod wealthgrowth;
 use docopt::Docopt;
 use enums::plot;
 use std::io::Error;
-use std::path::Path;
+use std::env;
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::ffi::OsStr;
 
 const VERSION: &'static str = "0.1.0";
 const USAGE: &'static str = "
@@ -30,6 +33,7 @@ Options:
     -h --help                   Show this screen.
     --version                   Show version.
 ";
+const TMPDIR: &'static str = "ledgerplot";
 
 fn main() -> Result<(), Error>
 {
@@ -94,6 +98,16 @@ fn main() -> Result<(), Error>
         }
     };
 
+    match prepare_temp_dir()
+    {
+        Ok(res) => res,
+        Err(e) =>
+        {
+            println!("Error: temporary directory could not be created: {:?}", e);
+            std::process::exit(1);
+        }
+    };
+
     match prepare_data(file, pricedb, &plot_type, startyear, endyear)
     {
         Ok(res) => res,
@@ -115,6 +129,24 @@ fn main() -> Result<(), Error>
     };
     cleanup(); // Remove temporary files
     std::process::exit(0);
+}
+
+fn prepare_temp_dir() -> Result<bool, Error>
+{
+    let paths = [env::temp_dir(), Path::new(TMPDIR).to_path_buf()];
+    let tmpdir: PathBuf = paths.iter().collect();
+    let tmpdir_str = tmpdir.to_str().unwrap();
+    if Path::new(&tmpdir_str).exists()
+    {
+       return Ok(true);
+    }
+
+    match fs::create_dir_all(&tmpdir_str)
+    {
+        Ok(res) => res,
+        Err(e) => return Err(e),
+    };
+    Ok(true)
 }
 
 fn prepare_data(
@@ -167,5 +199,12 @@ fn plot_data(aplot_type: &plot::PlotType, astartyear: i32, aendyear: i32) -> Res
 
 fn cleanup()
 {
-    println!("NotImplemented: Cleanup.");
+    for path in fs::read_dir(env::temp_dir()).unwrap()
+    {
+        let path = path.unwrap().path();
+        if path.file_stem() == Some(OsStr::new(TMPDIR))
+        {
+            fs::remove_dir_all(path).unwrap();
+        }
+    }
 }

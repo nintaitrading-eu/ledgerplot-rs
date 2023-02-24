@@ -1,11 +1,16 @@
 pub mod wealthgrowth
 {
+    use TMPDIR;
+    use std::env;
     use std::io::{Read,Write,Error};
     use std::fs::{File,OpenOptions};
+    use std::path::PathBuf;
     use std::process::Command;
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_total))))\n";
+    const FILE_OUTPUT1: &'static str = "ledgeroutput1.tmp";
+    const FILE_OUTPUT2: &'static str = "ledgeroutput2.tmp";
 
     pub fn prepare_data(
         afile: &str,
@@ -14,9 +19,6 @@ pub mod wealthgrowth
         aendyear: i32,
     ) -> Result<bool, Error>
     {
-        let path1: &str = "/var/tmp/ledgerplot/ledgeroutput1.tmp";
-        let path2: &str = "/var/tmp/ledgerplot/ledgeroutput2.tmp";
-
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
             .arg(afile)
@@ -63,14 +65,19 @@ pub mod wealthgrowth
             .expect("Failed to execute ledger command for output2.")
             .stdout;
 
-        let mut output_file1 = File::create(path1)?;
+        let path1: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT1);
+        let path1_str = path1.to_str().unwrap();
+        let path2: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT2);
+        let path2_str = path2.to_str().unwrap();
+
+        let mut output_file1 = File::create(path1_str)?;
         match output_file1.write_all(&output1)
         {
             Ok(_) => println!("Wrote output1."),
             Err(e) => return Err(e),
         };
 
-        let mut output_file2 = File::create(path2)?;
+        let mut output_file2 = File::create(path2_str)?;
         match output_file2.write_all(&output2)
         {
             Ok(_) => println!("Wrote output2."),
@@ -82,7 +89,7 @@ pub mod wealthgrowth
     pub fn plot_data(astartyear: i32, aendyear: i32) -> Result<bool, Error>
     {
         let script_without_xrange = "/usr/local/share/ledgerplot/gp_wealthgrowth.gnu";
-        let script_with_xrange: &str = "/var/tmp/ledgerplot/wealthgrowth.gnu";
+        let script_with_xrange: &str = "/tmp/ledgerplot/wealthgrowth.gnu";
 
         let xrange_line = format!("set xdata time\nset timefmt \"%Y-%m-%d\"\nset xrange [\"{}-01-01\":\"{}-12-31\"]\n", astartyear.to_string(), aendyear.to_string());
         let mut script_with_xrange_file = File::create(script_with_xrange)?;
