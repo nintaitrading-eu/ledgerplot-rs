@@ -8,7 +8,7 @@ pub mod income_vs_expenses
     use std::process::Command;
 
     const PLOT_TOTAL_FORMAT: &'static str =
-        "%(format_date(date, \"%Y-%m-%d\")) %(roundto(scrub(display_amount), 10))\n";
+        "%(format_date(date, \"%Y-%m-%d\")) %(roundto(scrub(display_amount), 2))\n";
     const FILE_OUTPUT1: &'static str = "ledgeroutput1.tmp";
     const FILE_OUTPUT2: &'static str = "ledgeroutput2.tmp";
 
@@ -30,7 +30,6 @@ pub mod income_vs_expenses
             .arg("income")
             .arg("-Y")
             .arg("--collapse")
-            .arg("--no-rounding")
             .arg("--plot-total-format")
             .arg(PLOT_TOTAL_FORMAT)
             .arg("-b")
@@ -52,7 +51,6 @@ pub mod income_vs_expenses
             .arg("expenses")
             .arg("-Y")
             .arg("--collapse")
-            .arg("--no-rounding")
             .arg("--plot-total-format")
             .arg(PLOT_TOTAL_FORMAT)
             .arg("-b")

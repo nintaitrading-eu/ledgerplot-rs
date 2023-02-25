@@ -8,7 +8,7 @@ pub mod wealthgrowth
     use std::process::Command;
 
     const PLOT_TOTAL_FORMAT: &'static str =
-        "%(format_date(date, \"%Y-%m-%d\")) %(abs(quantity(scrub(display_total))))\n";
+        "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(quantity(scrub(display_total)),2)))\n";
     const FILE_OUTPUT1: &'static str = "ledgeroutput1.tmp";
     const FILE_OUTPUT2: &'static str = "ledgeroutput2.tmp";
 
@@ -33,6 +33,8 @@ pub mod wealthgrowth
             .arg("assets")
             .arg("-D")
             .arg("--collapse")
+            .arg("--plot-total-format")
+            .arg(PLOT_TOTAL_FORMAT)
             .arg("-b")
             .arg(astartyear.to_string())
             .arg("-e")
@@ -43,8 +45,8 @@ pub mod wealthgrowth
         let output2: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
             .arg(afile)
-            .arg("--price-db")
-            .arg(apricedb)
+            //.arg("--price-db")
+            //.arg(apricedb)
             .arg("--strict")
             .arg("-X")
             .arg("EUR")
@@ -54,7 +56,6 @@ pub mod wealthgrowth
             .arg("liabilities")
             .arg("-D")
             .arg("--collapse")
-            .arg("--no-rounding")
             .arg("--plot-total-format")
             .arg(PLOT_TOTAL_FORMAT)
             .arg("-b")
