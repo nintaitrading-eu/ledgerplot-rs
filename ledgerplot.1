@@ -1,0 +1,22 @@
+.TH LEDGERPLOT 1 ledgerplot\-VERSION
+.SH NAME
+ledgerplot \- plot ledgerdata via gnuplot
+.SH SYNOPSIS
+.B ledgerplot
+.RB [ \-\-help ]
+.SH DEPENDS ON
+ledger
+gnuplot
+.SH DESCRIPTION
+Ledgerplot is a program, that plots ledger data via gnuplot.
+The plots are exported to png.
+.SH OPTIONS
+Check the usage info.
+.TP
+.B \-\-version
+Prints version information to standard output, then exits.
+.SH USAGE
+.SH SEE ALSO
+.SH BUGS
+.SH EXAMPLES
+ledgerplot --file=ledger.dat --pricedb=prices.db --startyear=2008 --endyear=2022 --type=WealthGrowth
