@@ -11,6 +11,7 @@ pub mod wealthgrowth
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(quantity(scrub(display_total)),2)))\n";
     const FILE_OUTPUT1: &'static str = "ledgeroutput1.tmp";
     const FILE_OUTPUT2: &'static str = "ledgeroutput2.tmp";
+    const FILE_OUTPUT3: &'static str = "ledgeroutput3.tmp";
 
     pub fn prepare_data(
         afile: &str,
@@ -65,11 +66,37 @@ pub mod wealthgrowth
             .output()
             .expect("Failed to execute ledger command for output2.")
             .stdout;
+        let output3: std::vec::Vec<u8> = Command::new("ledger")
+            .arg("-f")
+            .arg(afile)
+            .arg("--price-db")
+            .arg(apricedb)
+            .arg("--strict")
+            .arg("-X")
+            .arg("EUR")
+            .arg("--real")
+            .arg("-J")
+            .arg("reg")
+            .arg("assets")
+            .arg("liabilities")
+            .arg("-D")
+            .arg("--collapse")
+            .arg("--plot-total-format")
+            .arg(PLOT_TOTAL_FORMAT)
+            .arg("-b")
+            .arg(astartyear.to_string())
+            .arg("-e")
+            .arg((aendyear + 1).to_string())
+            .output()
+            .expect("Failed to execute ledger command for output3.")
+            .stdout;
 
         let path1: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT1);
         let path1_str = path1.to_str().unwrap();
         let path2: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT2);
         let path2_str = path2.to_str().unwrap();
+        let path3: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT3);
+        let path3_str = path3.to_str().unwrap();
 
         let mut output_file1 = File::create(path1_str)?;
         match output_file1.write_all(&output1)
@@ -82,6 +109,13 @@ pub mod wealthgrowth
         match output_file2.write_all(&output2)
         {
             Ok(_) => println!("Wrote output2."),
+            Err(e) => return Err(e),
+        };
+
+        let mut output_file3 = File::create(path3_str)?;
+        match output_file3.write_all(&output3)
+        {
+            Ok(_) => println!("Wrote output3."),
             Err(e) => return Err(e),
         };
         Ok(true)
