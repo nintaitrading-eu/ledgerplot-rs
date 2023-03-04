@@ -34,6 +34,8 @@ install:
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	@sed "s/VERSION/${VERSION}/g" < ledgerplot.1 > ${DESTDIR}${MANPREFIX}/man1/ledgerplot.1
 	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/ledgerplot.1
+	@echo installing gnuplot scripts to ${DESTDIR}${SHARE}/ledgerplot/
+	@cp -f src/gnuplot/* ${DESTDIR}${SHARE}/ledgerplot/
 
 uninstall:
 	@echo removing executable file from ${DESTDIR}${PREFIX}/bin
