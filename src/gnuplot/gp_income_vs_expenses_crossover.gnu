@@ -7,7 +7,6 @@ set xtics nomirror scale 0 center
 set ytics add ('' 0) scale 0
 set border 1
 set grid ytics
-set title "Yearly Income vs Expenses"
+set title "Yearly Passive Income Versus Everyday Expenses"
 set ylabel "Amount"
-#plot "/tmp/ledgerplot/ledgeroutput1.tmp" using 2:xticlabels(strftime('%Y', strptime('%Y-%m-%d', strcol(1)))) title "Income" linecolor rgb "light-green" with lines, '' using 0:2:2 with lines, "/tmp/ledgerplot/ledgeroutput2.tmp" using 2 title "Expenses" linecolor rgb "light-salmon", '' using 0:2:2 with lines
-plot "/tmp/ledgerplot/ledgeroutput1.tmp" using 2:xticlabels(strftime('%Y', strptime('%Y-%m-%d', strcol(1)))) title "Income" linecolor rgb "light-green" with lines, "/tmp/ledgerplot/ledgeroutput2.tmp" using 2 title "Expenses" linecolor rgb "light-salmon" with lines
+plot "/tmp/ledgerplot/ledgeroutput1.tmp" using 2:xticlabels(strftime('%Y', strptime('%Y-%m-%d', strcol(1)))) title "Passive income" linecolor rgb "green" with lines, "/tmp/ledgerplot/ledgeroutput2.tmp" using 2 title "Everyday expenses" linecolor rgb "orange" with lines, 25000 title "Max expenses" linecolor rgb "purple" linewidth 3
