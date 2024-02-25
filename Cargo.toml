@@ -1,0 +1,8 @@
+[package]
+name = "ledgerplot"
+version = "0.1.1"
+authors = ["Andy Nagels <thereisanewway@gmail.com>"]
+
+[dependencies]
+docopt = "1"
+gnuplot = "0.0.26"

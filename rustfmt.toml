@@ -1,0 +1,3 @@
+reorder_imports = false
+control_brace_style = "AlwaysNextLine"
+brace_style = "AlwaysNextLine"
