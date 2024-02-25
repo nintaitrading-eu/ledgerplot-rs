@@ -2,7 +2,7 @@ extern crate docopt;
 
 mod enums;
 mod income_vs_expenses;
-mod income_vs_expenses_crossover;
+mod passive_income_vs_expenses;
 mod wealthgrowth;
 
 use docopt::Docopt;
@@ -18,7 +18,7 @@ const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<IncomeVsExpenses|IncomeVsExpensesCrossOver|IncomePerCategory|ExpensesPerCategory|WealthGrowth> [--yearly|--monthly|--weekly]
+    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth> [--yearly|--monthly|--weekly]
     ledgerplot --help
     ledgerplot --version
 
@@ -27,7 +27,7 @@ Options:
     --pricedb=<file_name>       Price database file to use.
     --startyear=<year_start>    Plot from this year.
     --endyear=<year_end>        Plot until this year (inclusive).
-    --type=<IncomeVsExpenses|IncomeVsExpensesCrossOver|IncomePerCategory|ExpensesPerCategory|WealthGrowth>                          Create the given plot type.
+    --type=<IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth>                          Create the given plot type.
     --yearly                    Plot totals per year.
     --monthly                   Plot totals per month.
     --weekly                    Plot totals per week.
@@ -166,9 +166,9 @@ fn prepare_data(
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::IncomeVsExpensesCrossOver
+    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses
     {
-        match income_vs_expenses_crossover::income_vs_expenses_crossover::prepare_data(afile, astartyear, aendyear)
+        match passive_income_vs_expenses::passive_income_vs_expenses::prepare_data(afile, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", aplot_type),
             Err(e) => return Err(e),
@@ -195,9 +195,9 @@ fn plot_data(aplot_type: &plot::PlotType, astartyear: i32, aendyear: i32) -> Res
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::IncomeVsExpensesCrossOver
+    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses
     {
-        match income_vs_expenses_crossover::income_vs_expenses_crossover::plot_data()
+        match passive_income_vs_expenses::passive_income_vs_expenses::plot_data()
         {
             Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
             Err(e) => return Err(e),

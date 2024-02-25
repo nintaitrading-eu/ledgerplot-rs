@@ -1,4 +1,4 @@
-pub mod income_vs_expenses_crossover
+pub mod passive_income_vs_expenses
 {
     use TMPDIR;
     use std::env;
@@ -96,7 +96,7 @@ pub mod income_vs_expenses_crossover
     pub fn plot_data() -> Result<bool, Error>
     {
         match Command::new("gnuplot")
-            .arg("/usr/local/share/ledgerplot/gp_income_vs_expenses_crossover.gnu")
+            .arg("/usr/local/share/ledgerplot/gp_passive_income_vs_expenses.gnu")
             .status()
         {
             Ok(_) => println!("Created gnuplot output."),
