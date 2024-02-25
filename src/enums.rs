@@ -6,6 +6,7 @@ pub mod plot
     pub enum PlotType
     {
         IncomeVsExpenses,
+        IncomeVsExpensesCrossOver,
         IncomePerCategory,
         ExpensesPerCategory,
         WealthGrowth,
@@ -18,6 +19,7 @@ pub mod plot
             match *self
             {
                 PlotType::IncomeVsExpenses => "IncomeVsExpenses",
+                PlotType::IncomeVsExpensesCrossOver => "IncomeVsExpensesCrossOver",
                 PlotType::IncomePerCategory => "IncomePerCategory",
                 PlotType::ExpensesPerCategory => "ExpensesPerCategory",
                 PlotType::WealthGrowth => "WealthGrowth",
@@ -34,6 +36,7 @@ pub mod plot
             match a_str
             {
                 "IncomeVsExpenses" => Ok(PlotType::IncomeVsExpenses),
+                "IncomeVsExpensesCrossOver" => Ok(PlotType::IncomeVsExpensesCrossOver),
                 "IncomePerCategory" => Ok(PlotType::IncomePerCategory),
                 "ExpensesPerCategory" => Ok(PlotType::ExpensesPerCategory),
                 "WealthGrowth" => Ok(PlotType::WealthGrowth),

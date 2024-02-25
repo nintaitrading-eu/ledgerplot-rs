@@ -2,6 +2,7 @@ extern crate docopt;
 
 mod enums;
 mod income_vs_expenses;
+mod income_vs_expenses_crossover;
 mod wealthgrowth;
 
 use docopt::Docopt;
@@ -12,12 +13,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 
-const VERSION: &'static str = "0.1.0";
+const VERSION: &'static str = "0.1.1";
 const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth> [--yearly|--monthly|--weekly]
+    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<IncomeVsExpenses|IncomeVsExpensesCrossOver|IncomePerCategory|ExpensesPerCategory|WealthGrowth> [--yearly|--monthly|--weekly]
     ledgerplot --help
     ledgerplot --version
 
@@ -26,7 +27,7 @@ Options:
     --pricedb=<file_name>       Price database file to use.
     --startyear=<year_start>    Plot from this year.
     --endyear=<year_end>        Plot until this year (inclusive).
-    --type=<IncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth>                          Create the given plot type.
+    --type=<IncomeVsExpenses|IncomeVsExpensesCrossOver|IncomePerCategory|ExpensesPerCategory|WealthGrowth>                          Create the given plot type.
     --yearly                    Plot totals per year.
     --monthly                   Plot totals per month.
     --weekly                    Plot totals per week.
@@ -165,6 +166,14 @@ fn prepare_data(
             Err(e) => return Err(e),
         };
     }
+    if *aplot_type == plot::PlotType::IncomeVsExpensesCrossOver
+    {
+        match income_vs_expenses_crossover::income_vs_expenses_crossover::prepare_data(afile, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Err(e) => return Err(e),
+        };
+    }
     if *aplot_type == plot::PlotType::WealthGrowth
     {
         match wealthgrowth::wealthgrowth::prepare_data(afile, apricedb, astartyear, aendyear)
@@ -181,6 +190,14 @@ fn plot_data(aplot_type: &plot::PlotType, astartyear: i32, aendyear: i32) -> Res
     if *aplot_type == plot::PlotType::IncomeVsExpenses
     {
         match income_vs_expenses::income_vs_expenses::plot_data()
+        {
+            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
+            Err(e) => return Err(e),
+        };
+    }
+    if *aplot_type == plot::PlotType::IncomeVsExpensesCrossOver
+    {
+        match income_vs_expenses_crossover::income_vs_expenses_crossover::plot_data()
         {
             Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
             Err(e) => return Err(e),

@@ -1,0 +1,13 @@
+set terminal pngcairo size 1920,1080 enhanced font 'Inconsolata,10'
+set output 'yearly_income_vs_expenses_crossover.png'
+set style data histogram
+set style histogram clustered gap 1
+set style fill transparent solid 0.4 noborder
+set xtics nomirror scale 0 center
+set ytics add ('' 0) scale 0
+set border 1
+set grid ytics
+set title "Yearly Income vs Expenses"
+set ylabel "Amount"
+#plot "/tmp/ledgerplot/ledgeroutput1.tmp" using 2:xticlabels(strftime('%Y', strptime('%Y-%m-%d', strcol(1)))) title "Income" linecolor rgb "light-green" with lines, '' using 0:2:2 with lines, "/tmp/ledgerplot/ledgeroutput2.tmp" using 2 title "Expenses" linecolor rgb "light-salmon", '' using 0:2:2 with lines
+plot "/tmp/ledgerplot/ledgeroutput1.tmp" using 2:xticlabels(strftime('%Y', strptime('%Y-%m-%d', strcol(1)))) title "Income" linecolor rgb "light-green" with lines, "/tmp/ledgerplot/ledgeroutput2.tmp" using 2 title "Expenses" linecolor rgb "light-salmon" with lines
