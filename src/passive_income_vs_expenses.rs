@@ -9,8 +9,8 @@ pub mod passive_income_vs_expenses
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(scrub(display_amount), 2)))\n";
-    const FILE_OUTPUT1: &'static str = "ledgeroutput1.tmp";
-    const FILE_OUTPUT2: &'static str = "ledgeroutput2.tmp";
+    const FILE_OUTPUT1: &'static str = "passive_income_vs_expenses1.dat";
+    const FILE_OUTPUT2: &'static str = "passive_income_vs_expenses2.dat";
 
     pub fn prepare_data(
         afile: &str,
@@ -79,14 +79,14 @@ pub mod passive_income_vs_expenses
         let mut output_file1 = File::create(path1_str)?;
         match output_file1.write_all(&output1)
         {
-            Ok(_) => println!("Wrote output1."),
+            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT1),
             Err(e) => return Err(e),
         };
 
         let mut output_file2 = File::create(path2_str)?;
         match output_file2.write_all(&output2)
         {
-            Ok(_) => println!("Wrote output2."),
+            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT2),
             Err(e) => return Err(e),
         };
         Ok(true)

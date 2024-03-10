@@ -158,27 +158,27 @@ fn prepare_data(
     aendyear: i32,
 ) -> Result<bool, Error>
 {
-    if *aplot_type == plot::PlotType::IncomeVsExpenses
+    if *aplot_type == plot::PlotType::IncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
         match income_vs_expenses::income_vs_expenses::prepare_data(afile, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses),
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses
+    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
         match passive_income_vs_expenses::passive_income_vs_expenses::prepare_data(afile, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses),
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::WealthGrowth
+    if *aplot_type == plot::PlotType::WealthGrowth || *aplot_type == plot::PlotType::All
     {
         match wealthgrowth::wealthgrowth::prepare_data(afile, apricedb, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth),
             Err(e) => return Err(e),
         };
     }
@@ -187,27 +187,27 @@ fn prepare_data(
 
 fn plot_data(aplot_type: &plot::PlotType, astartyear: i32, aendyear: i32) -> Result<bool, Error>
 {
-    if *aplot_type == plot::PlotType::IncomeVsExpenses
+    if *aplot_type == plot::PlotType::IncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
         match income_vs_expenses::income_vs_expenses::plot_data()
         {
-            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
+            Ok(_) => println!("Data for {:?} plotted.", plot::PlotType::IncomeVsExpenses),
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses
+    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
         match passive_income_vs_expenses::passive_income_vs_expenses::plot_data()
         {
-            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
+            Ok(_) => println!("Data for {:?} plotted.", plot::PlotType::PassiveIncomeVsExpenses),
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::WealthGrowth
+    if *aplot_type == plot::PlotType::WealthGrowth || *aplot_type == plot::PlotType::All
     {
         match wealthgrowth::wealthgrowth::plot_data(astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
+            Ok(_) => println!("Data for {:?} plotted.", plot::PlotType::WealthGrowth),
             Err(e) => return Err(e),
         };
     }

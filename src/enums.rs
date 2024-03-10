@@ -5,6 +5,7 @@ pub mod plot
     #[derive(Debug, PartialEq)]
     pub enum PlotType
     {
+        All,
         IncomeVsExpenses,
         PassiveIncomeVsExpenses,
         IncomePerCategory,
@@ -18,6 +19,7 @@ pub mod plot
         {
             match *self
             {
+                PlotType::All => "All",
                 PlotType::IncomeVsExpenses => "IncomeVsExpenses",
                 PlotType::PassiveIncomeVsExpenses => "PassiveIncomeVsExpenses",
                 PlotType::IncomePerCategory => "IncomePerCategory",
@@ -35,6 +37,7 @@ pub mod plot
         {
             match a_str
             {
+                "All" => Ok(PlotType::All),
                 "IncomeVsExpenses" => Ok(PlotType::IncomeVsExpenses),
                 "PassiveIncomeVsExpenses" => Ok(PlotType::PassiveIncomeVsExpenses),
                 "IncomePerCategory" => Ok(PlotType::IncomePerCategory),
