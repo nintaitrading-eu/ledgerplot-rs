@@ -8,7 +8,7 @@ pub mod income_vs_expenses
     use std::process::Command;
 
     const PLOT_TOTAL_FORMAT: &'static str =
-        "%(format_date(date, \"%Y-%m-%d\")) %(roundto(scrub(display_amount), 2))\n";
+        "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(scrub(display_amount), 2)))\n";
     const FILE_OUTPUT1: &'static str = "income_vs_expenses1.dat";
     const FILE_OUTPUT2: &'static str = "income_vs_expenses2.dat";
 
