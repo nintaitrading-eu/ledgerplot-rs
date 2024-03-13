@@ -1,4 +1,4 @@
-set terminal pngcairo size 1920,1080 enhanced font 'Inconsolata,10'
+set terminal pngcairo size 1920,1080 enhanced font 'Inconsolata,12'
 set output 'yearly_wealthgrowth.png'
 #set xtics nomirror "" ,31104000 format "%Y"
 #set xtics offset 0 nomirror "" ,31104000 format "%Y-%m-%d"
