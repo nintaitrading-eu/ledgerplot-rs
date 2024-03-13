@@ -6,6 +6,7 @@ pub mod wealthgrowth
     use std::fs::{File,OpenOptions};
     use std::path::PathBuf;
     use std::process::Command;
+    use enums::plot;
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(quantity(scrub(display_total)),2)))\n";
@@ -13,7 +14,7 @@ pub mod wealthgrowth
     const FILE_OUTPUT2: &'static str = "wealthgrowth2.dat";
     const FILE_OUTPUT3: &'static str = "wealthgrowth3.dat";
 
-    pub fn prepare_data(
+    fn prepare_data(
         afile: &str,
         apricedb: &str,
         astartyear: i32,
@@ -121,8 +122,18 @@ pub mod wealthgrowth
         Ok(true)
     }
 
-    pub fn plot_data(astartyear: i32, aendyear: i32) -> Result<bool, Error>
+    pub fn plot_data(
+        afile: &str,
+        apricedb: &str,
+        astartyear: i32,
+        aendyear: i32) -> Result<bool, Error>
     {
+        match prepare_data(afile, apricedb, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth),
+            Err(e) => return Err(e),
+        };
+
         let script_without_xrange = "/usr/local/share/ledgerplot/gp_wealthgrowth.gnu";
         let script_with_xrange: &str = "/tmp/ledgerplot/wealthgrowth.gnu";
 

@@ -101,17 +101,7 @@ fn main() -> Result<(), Error>
         }
     };
 
-    match prepare_data(file, pricedb, &plot_type, startyear, endyear)
-    {
-        Ok(res) => res,
-        Err(e) =>
-        {
-            println!("Error: data could not be prepared: {:?}", e);
-            std::process::exit(1);
-        }
-    };
-
-    match plot_data(&plot_type, startyear, endyear)
+    match plot_data(file, pricedb, &plot_type, startyear, endyear)
     {
         Ok(res) => res,
         Err(e) =>
@@ -120,6 +110,7 @@ fn main() -> Result<(), Error>
             std::process::exit(1);
         }
     };
+
     cleanup(); // Remove temporary files
     std::process::exit(0);
 }
@@ -142,7 +133,7 @@ fn prepare_temp_dir() -> Result<bool, Error>
     Ok(true)
 }
 
-fn prepare_data(
+fn plot_data(
     afile: &str,
     apricedb: &str,
     aplot_type: &plot::PlotType,
@@ -152,7 +143,7 @@ fn prepare_data(
 {
     if *aplot_type == plot::PlotType::IncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        match income_vs_expenses::income_vs_expenses::prepare_data(afile, astartyear, aendyear)
+        match income_vs_expenses::income_vs_expenses::plot_data(afile, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses),
             Err(e) => return Err(e),
@@ -160,7 +151,7 @@ fn prepare_data(
     }
     if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        match passive_income_vs_expenses::passive_income_vs_expenses::prepare_data(afile, astartyear, aendyear)
+        match passive_income_vs_expenses::passive_income_vs_expenses::plot_data(afile, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses),
             Err(e) => return Err(e),
@@ -168,7 +159,7 @@ fn prepare_data(
     }
     if *aplot_type == plot::PlotType::WealthGrowth || *aplot_type == plot::PlotType::All
     {
-        match wealthgrowth::wealthgrowth::prepare_data(afile, apricedb, astartyear, aendyear)
+        match wealthgrowth::wealthgrowth::plot_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth),
             Err(e) => return Err(e),
@@ -176,7 +167,6 @@ fn prepare_data(
     }
     if *aplot_type == plot::PlotType::ExpensesPerCategory || *aplot_type == plot::PlotType::All
     {
-        // TODO: other methods should plot too, no more public prepare.
         match expenses_per_category::expenses_per_category::plot_data(afile, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
@@ -185,46 +175,9 @@ fn prepare_data(
     }
     if *aplot_type == plot::PlotType::IncomeHeatmap || *aplot_type == plot::PlotType::All
     {
-        match income_heatmap::income_heatmap::prepare_data(afile, astartyear, aendyear)
+        match income_heatmap::income_heatmap::plot_data(afile, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeHeatmap),
-            Err(e) => return Err(e),
-        };
-    }
-    Ok(true)
-}
-
-fn plot_data(aplot_type: &plot::PlotType, astartyear: i32, aendyear: i32) -> Result<bool, Error>
-{
-    if *aplot_type == plot::PlotType::IncomeVsExpenses || *aplot_type == plot::PlotType::All
-    {
-        match income_vs_expenses::income_vs_expenses::plot_data()
-        {
-            Ok(_) => println!("Data for {:?} plotted.", plot::PlotType::IncomeVsExpenses),
-            Err(e) => return Err(e),
-        };
-    }
-    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses || *aplot_type == plot::PlotType::All
-    {
-        match passive_income_vs_expenses::passive_income_vs_expenses::plot_data()
-        {
-            Ok(_) => println!("Data for {:?} plotted.", plot::PlotType::PassiveIncomeVsExpenses),
-            Err(e) => return Err(e),
-        };
-    }
-    if *aplot_type == plot::PlotType::WealthGrowth || *aplot_type == plot::PlotType::All
-    {
-        match wealthgrowth::wealthgrowth::plot_data(astartyear, aendyear)
-        {
-            Ok(_) => println!("Data for {:?} plotted.", plot::PlotType::WealthGrowth),
-            Err(e) => return Err(e),
-        };
-    }
-    if *aplot_type == plot::PlotType::IncomeHeatmap || *aplot_type == plot::PlotType::All
-    {
-        match income_heatmap::income_heatmap::plot_data()
-        {
-            Ok(_) => println!("Data for {:?} plotted.", plot::PlotType::IncomeHeatmap),
             Err(e) => return Err(e),
         };
     }

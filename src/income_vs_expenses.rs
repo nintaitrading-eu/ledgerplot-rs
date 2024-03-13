@@ -6,13 +6,14 @@ pub mod income_vs_expenses
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
+    use enums::plot;
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(scrub(display_amount), 2)))\n";
     const FILE_OUTPUT1: &'static str = "income_vs_expenses1.dat";
     const FILE_OUTPUT2: &'static str = "income_vs_expenses2.dat";
 
-    pub fn prepare_data(
+    fn prepare_data(
         afile: &str,
         astartyear: i32,
         aendyear: i32,
@@ -84,8 +85,18 @@ pub mod income_vs_expenses
         Ok(true)
     }
 
-    pub fn plot_data() -> Result<bool, Error>
+    pub fn plot_data(
+        afile: &str,
+        astartyear: i32,
+        aendyear: i32,
+    ) -> Result<bool, Error>
     {
+        match prepare_data(afile, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses),
+            Err(e) => return Err(e),
+        };
+
         match Command::new("gnuplot")
             .arg("/usr/local/share/ledgerplot/gp_income_vs_expenses.gnu")
             .status()
