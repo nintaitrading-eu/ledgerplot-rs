@@ -4,6 +4,7 @@ mod enums;
 mod income_vs_expenses;
 mod passive_income_vs_expenses;
 mod wealthgrowth;
+mod expenses_per_category;
 mod income_heatmap;
 
 use docopt::Docopt;
@@ -19,7 +20,7 @@ const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|IncomeHeatMap> [--yearly|--monthly|--weekly]
+    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|IncomeHeatMap>
     ledgerplot --help
     ledgerplot --version
 
@@ -29,9 +30,6 @@ Options:
     --startyear=<year_start>    Plot from this year.
     --endyear=<year_end>        Plot until this year (inclusive).
     --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|IncomeHeatMap>                          Create the given plot type.
-    --yearly                    Plot totals per year.
-    --monthly                   Plot totals per month.
-    --weekly                    Plot totals per week.
     -h --help                   Show this screen.
     --version                   Show version.
 ";
@@ -62,13 +60,6 @@ fn main() -> Result<(), Error>
         println!("Price database {} not found.", pricedb);
         std::process::exit(1);
     };
-
-    if args.get_bool("--yearly")
-        || args.get_bool("--monthly")
-        || args.get_bool("--weekly")
-    {
-        println!("NotImplemented: --yearly, --monthly or --weekly options.");
-    }
 
     let startyear = match args.get_str("--startyear").parse::<i32>()
     {
@@ -180,6 +171,15 @@ fn prepare_data(
         match wealthgrowth::wealthgrowth::prepare_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth),
+            Err(e) => return Err(e),
+        };
+    }
+    if *aplot_type == plot::PlotType::ExpensesPerCategory || *aplot_type == plot::PlotType::All
+    {
+        // TODO: other methods should plot too, no more public prepare.
+        match expenses_per_category::expenses_per_category::plot_data(afile, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
             Err(e) => return Err(e),
         };
     }
