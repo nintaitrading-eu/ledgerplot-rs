@@ -1,4 +1,4 @@
-set terminal pngcairo size 1920,1080 enhanced font 'Inconsolata,10'
+set terminal pngcairo size 1920,1080 enhanced font 'Inconsolata,12'
 set output 'yearly_passive_income_vs_expenses.png'
 set style data histogram
 set style histogram clustered gap 1
