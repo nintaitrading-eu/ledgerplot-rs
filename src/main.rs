@@ -5,6 +5,7 @@ mod income_vs_expenses;
 mod passive_income_vs_expenses;
 mod wealthgrowth;
 mod expenses_per_category;
+mod income_per_category;
 mod income_heatmap;
 
 use docopt::Docopt;
@@ -170,6 +171,14 @@ fn plot_data(
         match expenses_per_category::expenses_per_category::plot_data(afile, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
+            Err(e) => return Err(e),
+        };
+    }
+    if *aplot_type == plot::PlotType::IncomePerCategory || *aplot_type == plot::PlotType::All
+    {
+        match income_per_category::income_per_category::plot_data(afile, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomePerCategory),
             Err(e) => return Err(e),
         };
     }
