@@ -3,6 +3,7 @@ pub mod expenses_per_category
     use TMPDIR;
     use std::env;
     use std::io::{Write,Error};
+    use std::fs;
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
@@ -11,6 +12,7 @@ pub mod expenses_per_category
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(partial_account(options.flat)) %(abs(quantity(scrub(display_total))))\n";
     const FILE_OUTPUT1: &'static str = "expenses_per_category.dat";
+    const FILE_OUTPUT_FINAL: &'static str = "expenses_per_category.png"; // As defined in the gnu file.
     const PLOT_SORT_EXPRESSION: &'static str =
         "-abs(amount)";
 
@@ -19,9 +21,6 @@ pub mod expenses_per_category
         ayear: i32
     ) -> Result<bool, Error>
     {
-        // TODO: Loop over years from astartyear to aendyear (iter?)
-        // TODO: change outputfile name to include each year
-        // TODO: Do the same for the data preparation
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
             .arg(afile)
@@ -63,23 +62,33 @@ pub mod expenses_per_category
         aendyear: i32,
     ) -> Result<bool, Error>
     {
-        // TODO: Write loop over the years.
-        // Call plot on each iteration.
-        // Move file after plotting.
-        // Remove prepare_data call in main.rs.
-        match prepare_data(afile, aendyear) // TODO: change to loop var
+        for year in astartyear .. aendyear + 1
         {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
-            Err(e) => return Err(e),
-        }
+            match prepare_data(afile, year)
+            {
+                Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
+                Err(e) => return Err(e),
+            }
 
-        match Command::new("gnuplot")
-            .arg("/usr/local/share/ledgerplot/gp_expenses_per_category.gnu")
-            .status()
-        {
-            Ok(_) => println!("Created gnuplot output."),
-            Err(e) => return Err(e),
-        };
+            match Command::new("gnuplot")
+                .arg("/usr/local/share/ledgerplot/gp_expenses_per_category.gnu")
+                .status()
+            {
+                Ok(_) => println!("Created gnuplot output."),
+                Err(e) => return Err(e),
+            }
+
+            let output_file = FILE_OUTPUT_FINAL
+                .to_string()
+                .to_lowercase()
+                .replace(".png", &format!("_{}.png", year));
+
+            match fs::rename(FILE_OUTPUT_FINAL, &output_file)
+            {
+                Ok(_) => println!("Wrote data to {}.", &output_file),
+                Err(e) => println!("Error writing data: {}", e),
+            };
+        }
         Ok(true)
     }
 }
