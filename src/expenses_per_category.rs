@@ -14,7 +14,7 @@ pub mod expenses_per_category
     const FILE_OUTPUT1: &'static str = "expenses_per_category.dat";
     const FILE_OUTPUT_FINAL: &'static str = "expenses_per_category.png"; // As defined in the gnu file.
     const PLOT_SORT_EXPRESSION: &'static str =
-        "-abs(amount)";
+        "-abs(quantity(scrub(display_total)))";
 
     fn prepare_data(
         afile: &str,
