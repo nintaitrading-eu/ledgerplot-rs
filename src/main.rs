@@ -16,7 +16,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 
-const VERSION: &'static str = "0.1.1";
+const VERSION: &'static str = "0.1.2";
 const USAGE: &'static str = "
 Ledgerplot.
 
