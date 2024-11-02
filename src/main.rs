@@ -144,7 +144,7 @@ fn plot_data(
 {
     if *aplot_type == plot::PlotType::IncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        match income_vs_expenses::income_vs_expenses::plot_data(afile, astartyear, aendyear)
+        match income_vs_expenses::income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses),
             Err(e) => return Err(e),
