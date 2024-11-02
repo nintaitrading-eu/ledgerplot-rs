@@ -18,12 +18,15 @@ pub mod income_per_category
 
     fn prepare_data(
         afile: &str,
+        apricedb: &str,
         ayear: i32
     ) -> Result<bool, Error>
     {
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
             .arg(afile)
+            .arg("--price-db")
+            .arg(apricedb)
             .arg("--strict")
             .arg("-X")
             .arg("EUR")
@@ -58,13 +61,14 @@ pub mod income_per_category
 
     pub fn plot_data(
         afile: &str,
+        apricedb: &str,
         astartyear: i32,
         aendyear: i32,
     ) -> Result<bool, Error>
     {
         for year in astartyear .. aendyear + 1
         {
-            match prepare_data(afile, year)
+            match prepare_data(afile, apricedb, year)
             {
                 Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomePerCategory),
                 Err(e) => return Err(e),

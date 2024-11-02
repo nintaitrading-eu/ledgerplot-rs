@@ -152,7 +152,7 @@ fn plot_data(
     }
     if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        match passive_income_vs_expenses::passive_income_vs_expenses::plot_data(afile, astartyear, aendyear)
+        match passive_income_vs_expenses::passive_income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses),
             Err(e) => return Err(e),
@@ -168,7 +168,7 @@ fn plot_data(
     }
     if *aplot_type == plot::PlotType::ExpensesPerCategory || *aplot_type == plot::PlotType::All
     {
-        match expenses_per_category::expenses_per_category::plot_data(afile, astartyear, aendyear)
+        match expenses_per_category::expenses_per_category::plot_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
             Err(e) => return Err(e),
@@ -176,7 +176,7 @@ fn plot_data(
     }
     if *aplot_type == plot::PlotType::IncomePerCategory || *aplot_type == plot::PlotType::All
     {
-        match income_per_category::income_per_category::plot_data(afile, astartyear, aendyear)
+        match income_per_category::income_per_category::plot_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomePerCategory),
             Err(e) => return Err(e),
@@ -184,7 +184,7 @@ fn plot_data(
     }
     if *aplot_type == plot::PlotType::IncomeHeatmap || *aplot_type == plot::PlotType::All
     {
-        match income_heatmap::income_heatmap::plot_data(afile, astartyear, aendyear)
+        match income_heatmap::income_heatmap::plot_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeHeatmap),
             Err(e) => return Err(e),

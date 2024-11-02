@@ -15,6 +15,7 @@ pub mod income_heatmap
 
     fn prepare_data(
         afile: &str,
+        apricedb: &str,
         astartyear: i32,
         aendyear: i32,
     ) -> Result<bool, Error>
@@ -22,6 +23,8 @@ pub mod income_heatmap
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
             .arg(afile)
+            .arg("--price-db")
+            .arg(apricedb)
             .arg("--strict")
             .arg("-X")
             .arg("EUR")
@@ -87,11 +90,12 @@ pub mod income_heatmap
 
     pub fn plot_data(
         afile: &str,
+        apricedb: &str,
         astartyear: i32,
         aendyear: i32,
     ) -> Result<bool, Error>
     {
-        match prepare_data(afile, astartyear, aendyear)
+        match prepare_data(afile, apricedb, astartyear, aendyear)
         {
             Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeHeatmap),
             Err(e) => return Err(e),
