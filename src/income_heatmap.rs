@@ -1,4 +1,4 @@
-pub mod income_vs_expenses
+pub mod income_heatmap
 {
     use TMPDIR;
     use std::env;
@@ -9,9 +9,9 @@ pub mod income_vs_expenses
     use enums::plot;
 
     const PLOT_TOTAL_FORMAT: &'static str =
-        "%(format_date(date, \"%Y-%m-%d\")) %(roundto(abs(quantity(scrub(display_amount))), 0))\n";
-    const FILE_OUTPUT1: &'static str = "income_vs_expenses1.dat";
-    const FILE_OUTPUT2: &'static str = "income_vs_expenses2.dat";
+        "%(format_date(date, \"%Y-%m-%d\")) %(roundto(scrub(display_amount), 2))\n";
+    const FILE_OUTPUT1: &'static str = "income_heatmap1.dat";
+    const FILE_OUTPUT2: &'static str = "income_heatmap2.dat";
 
     fn prepare_data(
         afile: &str,
@@ -97,12 +97,12 @@ pub mod income_vs_expenses
     {
         match prepare_data(afile, apricedb, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeHeatmap),
             Err(e) => return Err(e),
         };
 
         match Command::new("gnuplot")
-            .arg("/usr/local/share/ledgerplot/gp_income_vs_expenses.gnu")
+            .arg("/usr/local/share/ledgerplot/gp_income_heatmap.gnu")
             .status()
         {
             Ok(_) => println!("Created gnuplot output."),

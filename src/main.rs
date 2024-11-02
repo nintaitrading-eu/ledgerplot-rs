@@ -4,6 +4,9 @@ mod enums;
 mod income_vs_expenses;
 mod passive_income_vs_expenses;
 mod wealthgrowth;
+mod expenses_per_category;
+mod income_per_category;
+mod income_heatmap;
 
 use docopt::Docopt;
 use enums::plot;
@@ -13,12 +16,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 
-const VERSION: &'static str = "0.1.1";
+const VERSION: &'static str = "0.1.2";
 const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth> [--yearly|--monthly|--weekly]
+    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|IncomeHeatMap>
     ledgerplot --help
     ledgerplot --version
 
@@ -27,10 +30,7 @@ Options:
     --pricedb=<file_name>       Price database file to use.
     --startyear=<year_start>    Plot from this year.
     --endyear=<year_end>        Plot until this year (inclusive).
-    --type=<IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth>                          Create the given plot type.
-    --yearly                    Plot totals per year.
-    --monthly                   Plot totals per month.
-    --weekly                    Plot totals per week.
+    --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|IncomeHeatMap>                          Create the given plot type.
     -h --help                   Show this screen.
     --version                   Show version.
 ";
@@ -61,13 +61,6 @@ fn main() -> Result<(), Error>
         println!("Price database {} not found.", pricedb);
         std::process::exit(1);
     };
-
-    if args.get_bool("--yearly")
-        || args.get_bool("--monthly")
-        || args.get_bool("--weekly")
-    {
-        println!("NotImplemented: --yearly, --monthly or --weekly options.");
-    }
 
     let startyear = match args.get_str("--startyear").parse::<i32>()
     {
@@ -109,17 +102,7 @@ fn main() -> Result<(), Error>
         }
     };
 
-    match prepare_data(file, pricedb, &plot_type, startyear, endyear)
-    {
-        Ok(res) => res,
-        Err(e) =>
-        {
-            println!("Error: data could not be prepared: {:?}", e);
-            std::process::exit(1);
-        }
-    };
-
-    match plot_data(&plot_type, startyear, endyear)
+    match plot_data(file, pricedb, &plot_type, startyear, endyear)
     {
         Ok(res) => res,
         Err(e) =>
@@ -128,6 +111,7 @@ fn main() -> Result<(), Error>
             std::process::exit(1);
         }
     };
+
     cleanup(); // Remove temporary files
     std::process::exit(0);
 }
@@ -150,7 +134,7 @@ fn prepare_temp_dir() -> Result<bool, Error>
     Ok(true)
 }
 
-fn prepare_data(
+fn plot_data(
     afile: &str,
     apricedb: &str,
     aplot_type: &plot::PlotType,
@@ -158,56 +142,51 @@ fn prepare_data(
     aendyear: i32,
 ) -> Result<bool, Error>
 {
-    if *aplot_type == plot::PlotType::IncomeVsExpenses
+    if *aplot_type == plot::PlotType::IncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        match income_vs_expenses::income_vs_expenses::prepare_data(afile, astartyear, aendyear)
+        match income_vs_expenses::income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses),
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses
+    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        match passive_income_vs_expenses::passive_income_vs_expenses::prepare_data(afile, astartyear, aendyear)
+        match passive_income_vs_expenses::passive_income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses),
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::WealthGrowth
+    if *aplot_type == plot::PlotType::WealthGrowth || *aplot_type == plot::PlotType::All
     {
-        match wealthgrowth::wealthgrowth::prepare_data(afile, apricedb, astartyear, aendyear)
+        match wealthgrowth::wealthgrowth::plot_data(afile, apricedb, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} prepared.", aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth),
             Err(e) => return Err(e),
         };
     }
-    Ok(true)
-}
-
-fn plot_data(aplot_type: &plot::PlotType, astartyear: i32, aendyear: i32) -> Result<bool, Error>
-{
-    if *aplot_type == plot::PlotType::IncomeVsExpenses
+    if *aplot_type == plot::PlotType::ExpensesPerCategory || *aplot_type == plot::PlotType::All
     {
-        match income_vs_expenses::income_vs_expenses::plot_data()
+        match expenses_per_category::expenses_per_category::plot_data(afile, apricedb, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses
+    if *aplot_type == plot::PlotType::IncomePerCategory || *aplot_type == plot::PlotType::All
     {
-        match passive_income_vs_expenses::passive_income_vs_expenses::plot_data()
+        match income_per_category::income_per_category::plot_data(afile, apricedb, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomePerCategory),
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::WealthGrowth
+    if *aplot_type == plot::PlotType::IncomeHeatmap || *aplot_type == plot::PlotType::All
     {
-        match wealthgrowth::wealthgrowth::plot_data(astartyear, aendyear)
+        match income_heatmap::income_heatmap::plot_data(afile, apricedb, astartyear, aendyear)
         {
-            Ok(_) => println!("Data for {:?} plotted.", *aplot_type),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeHeatmap),
             Err(e) => return Err(e),
         };
     }

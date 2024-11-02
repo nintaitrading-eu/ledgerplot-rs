@@ -6,14 +6,16 @@ pub mod passive_income_vs_expenses
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
+    use enums::plot;
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(scrub(display_amount), 2)))\n";
-    const FILE_OUTPUT1: &'static str = "ledgeroutput1.tmp";
-    const FILE_OUTPUT2: &'static str = "ledgeroutput2.tmp";
+    const FILE_OUTPUT1: &'static str = "passive_income_vs_expenses1.dat";
+    const FILE_OUTPUT2: &'static str = "passive_income_vs_expenses2.dat";
 
-    pub fn prepare_data(
+    fn prepare_data(
         afile: &str,
+        apricedb: &str,
         astartyear: i32,
         aendyear: i32,
     ) -> Result<bool, Error>
@@ -21,6 +23,8 @@ pub mod passive_income_vs_expenses
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
             .arg(afile)
+            .arg("--price-db")
+            .arg(apricedb)
             .arg("--strict")
             .arg("-X")
             .arg("EUR")
@@ -28,6 +32,7 @@ pub mod passive_income_vs_expenses
             .arg("-J")
             .arg("reg")
             .arg("income:stock:dividend")
+            .arg("income:etf:dividend")
             .arg("income:interest")
             .arg("-Y")
             .arg("--collapse")
@@ -51,14 +56,12 @@ pub mod passive_income_vs_expenses
             .arg("-J")
             .arg("reg")
             .arg("expenses")
-            .arg("and not expenses:tax:stock")
-            .arg("and not expenses:tax:roerende_voorheffing:stock")
+            .arg("and not expenses:stock")
             .arg("and not expenses:crypto")
+            .arg("and not expenses:etf")
+            .arg("and not expenses:bond")
+            .arg("and not expenses:fund")
             .arg("and not expenses:nintai_bvba")
-            .arg("and not expenses:other:binckbank")
-            .arg("and not expenses:other:stock")
-            .arg("and not expenses:incasso")
-            .arg("and not expenses:commission")
             .arg("-Y")
             .arg("--collapse")
             .arg("--no-rounding")
@@ -80,21 +83,32 @@ pub mod passive_income_vs_expenses
         let mut output_file1 = File::create(path1_str)?;
         match output_file1.write_all(&output1)
         {
-            Ok(_) => println!("Wrote output1."),
+            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT1),
             Err(e) => return Err(e),
         };
 
         let mut output_file2 = File::create(path2_str)?;
         match output_file2.write_all(&output2)
         {
-            Ok(_) => println!("Wrote output2."),
+            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT2),
             Err(e) => return Err(e),
         };
         Ok(true)
     }
 
-    pub fn plot_data() -> Result<bool, Error>
+    pub fn plot_data(
+        afile: &str,
+        apricedb: &str,
+        astartyear: i32,
+        aendyear: i32,
+    ) -> Result<bool, Error>
     {
+        match prepare_data(afile, apricedb, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses),
+            Err(e) => return Err(e),
+        };
+
         match Command::new("gnuplot")
             .arg("/usr/local/share/ledgerplot/gp_passive_income_vs_expenses.gnu")
             .status()

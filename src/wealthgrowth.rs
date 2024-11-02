@@ -6,14 +6,15 @@ pub mod wealthgrowth
     use std::fs::{File,OpenOptions};
     use std::path::PathBuf;
     use std::process::Command;
+    use enums::plot;
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(quantity(scrub(display_total)),2)))\n";
-    const FILE_OUTPUT1: &'static str = "ledgeroutput1.tmp";
-    const FILE_OUTPUT2: &'static str = "ledgeroutput2.tmp";
-    const FILE_OUTPUT3: &'static str = "ledgeroutput3.tmp";
+    const FILE_OUTPUT1: &'static str = "wealthgrowth1.dat";
+    const FILE_OUTPUT2: &'static str = "wealthgrowth2.dat";
+    const FILE_OUTPUT3: &'static str = "wealthgrowth3.dat";
 
-    pub fn prepare_data(
+    fn prepare_data(
         afile: &str,
         apricedb: &str,
         astartyear: i32,
@@ -101,28 +102,38 @@ pub mod wealthgrowth
         let mut output_file1 = File::create(path1_str)?;
         match output_file1.write_all(&output1)
         {
-            Ok(_) => println!("Wrote output1."),
+            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT1),
             Err(e) => return Err(e),
         };
 
         let mut output_file2 = File::create(path2_str)?;
         match output_file2.write_all(&output2)
         {
-            Ok(_) => println!("Wrote output2."),
+            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT2),
             Err(e) => return Err(e),
         };
 
         let mut output_file3 = File::create(path3_str)?;
         match output_file3.write_all(&output3)
         {
-            Ok(_) => println!("Wrote output3."),
+            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT3),
             Err(e) => return Err(e),
         };
         Ok(true)
     }
 
-    pub fn plot_data(astartyear: i32, aendyear: i32) -> Result<bool, Error>
+    pub fn plot_data(
+        afile: &str,
+        apricedb: &str,
+        astartyear: i32,
+        aendyear: i32) -> Result<bool, Error>
     {
+        match prepare_data(afile, apricedb, astartyear, aendyear)
+        {
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth),
+            Err(e) => return Err(e),
+        };
+
         let script_without_xrange = "/usr/local/share/ledgerplot/gp_wealthgrowth.gnu";
         let script_with_xrange: &str = "/tmp/ledgerplot/wealthgrowth.gnu";
 

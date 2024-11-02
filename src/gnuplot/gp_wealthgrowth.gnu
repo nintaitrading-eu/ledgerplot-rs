@@ -1,4 +1,4 @@
-set terminal pngcairo size 1920,1080 enhanced font 'Inconsolata,10'
+set terminal pngcairo size 1920,1080 enhanced font 'Inconsolata,12'
 set output 'yearly_wealthgrowth.png'
 #set xtics nomirror "" ,31104000 format "%Y"
 #set xtics offset 0 nomirror "" ,31104000 format "%Y-%m-%d"
@@ -12,5 +12,5 @@ set grid xtics mxtics ytics mytics
 set title "Wealthgrowth"
 set ylabel "Amount"
 set style fill transparent solid 0.6 noborder
-plot "/tmp/ledgerplot/ledgeroutput1.tmp" using 1:2 with filledcurves x1 title "Assets" linecolor rgb "light-green", "/tmp/ledgerplot/ledgeroutput2.tmp" using 1:2 with filledcurves y1=0 title "Liabilities" linecolor rgb "light-salmon", "/tmp/ledgerplot/ledgeroutput3.tmp" using 1:2 with lines title "NetWorth" linecolor rgb "dark-blue"
+plot "/tmp/ledgerplot/wealthgrowth1.dat" using 1:2 with filledcurves x1 title "Assets" linecolor rgb "light-green", "/tmp/ledgerplot/wealthgrowth2.dat" using 1:2 with filledcurves y1=0 title "Liabilities" linecolor rgb "light-salmon", "/tmp/ledgerplot/wealthgrowth3.dat" using 1:2 with lines title "NetWorth" linecolor rgb "dark-blue", 625000 title "4%-amount for 25k" linecolor rgb "purple" linewidth 3
 

@@ -5,11 +5,13 @@ pub mod plot
     #[derive(Debug, PartialEq)]
     pub enum PlotType
     {
+        All,
         IncomeVsExpenses,
         PassiveIncomeVsExpenses,
         IncomePerCategory,
         ExpensesPerCategory,
         WealthGrowth,
+        IncomeHeatmap,
     }
 
     /*impl PlotType
@@ -18,11 +20,13 @@ pub mod plot
         {
             match *self
             {
+                PlotType::All => "All",
                 PlotType::IncomeVsExpenses => "IncomeVsExpenses",
                 PlotType::PassiveIncomeVsExpenses => "PassiveIncomeVsExpenses",
                 PlotType::IncomePerCategory => "IncomePerCategory",
                 PlotType::ExpensesPerCategory => "ExpensesPerCategory",
                 PlotType::WealthGrowth => "WealthGrowth",
+                PlotType::IncomeHeatmap=> "IncomeHeatmap",
             }
         }
     }*/
@@ -35,11 +39,13 @@ pub mod plot
         {
             match a_str
             {
+                "All" => Ok(PlotType::All),
                 "IncomeVsExpenses" => Ok(PlotType::IncomeVsExpenses),
                 "PassiveIncomeVsExpenses" => Ok(PlotType::PassiveIncomeVsExpenses),
                 "IncomePerCategory" => Ok(PlotType::IncomePerCategory),
                 "ExpensesPerCategory" => Ok(PlotType::ExpensesPerCategory),
                 "WealthGrowth" => Ok(PlotType::WealthGrowth),
+                "IncomeHeatmap" => Ok(PlotType::IncomeHeatmap),
                 _ => Err(()),
             }
         }
