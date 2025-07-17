@@ -61,6 +61,7 @@ pub mod passive_income_vs_expenses
             .arg("and not expenses:etf")
             .arg("and not expenses:bond")
             .arg("and not expenses:fund")
+            .arg("and not expenses:turbo")
             .arg("and not expenses:nintai_bvba")
             .arg("-Y")
             .arg("--collapse")
