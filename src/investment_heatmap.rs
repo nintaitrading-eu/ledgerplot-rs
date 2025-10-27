@@ -10,7 +10,8 @@ pub mod investment_heatmap
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(roundto(scrub(display_amount), 2))\n";
-    const FILE_OUTPUT1: &'static str = "investment_heatmap.dat";
+    const DAT_RAW: &'static str = "investment_heatmap_raw.dat";
+    const DAT_CONVERTED: &'static str = "investment_heatmap.dat";
 
     fn prepare_data(
         afile: &str,
@@ -38,13 +39,13 @@ pub mod investment_heatmap
             .expect("Failed to execute ledger command for output1.")
             .stdout;
 
-        let path1: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT1);
-        let path1_str = path1.to_str().unwrap();
+        let path_raw: PathBuf = env::temp_dir().join(TMPDIR).join(DAT_RAW);
+        let path_raw_str = path_raw.to_str().unwrap();
 
-        let mut output_file1 = File::create(path1_str)?;
-        match output_file1.write_all(&output1)
+        let mut output_raw = File::create(path_raw_str)?;
+        match output_raw.write_all(&output1)
         {
-            Ok(_) => println!("Wrote data to {}.", path1_str),
+            Ok(_) => println!("Wrote data to {}.", path_raw_str),
             Err(e) => return Err(e),
         };
 
@@ -56,8 +57,46 @@ pub mod investment_heatmap
         // ,account01,account02,... (note empmty first col)
         // Needs a mapper: asset name -> account (name + col idx)
         // Needs a mapper: value range -> int value 1 - 5
+        let path_converted: PathBuf = env::temp_dir().join(TMPDIR).join(DAT_CONVERTED);
+        let path_converted_str = path_converted.to_str().unwrap();
+        match convert_data(&path_raw_str)
+        {
+            Ok(_) => println!("Wrote converted data to {}.", path_converted_str),
+            Err(e) => return Err(e), // TODO: Custom error handling
+        }
 
         Ok(true)
+    }
+
+    fn convert_data(afile: &str) -> Result<bool, Error>
+    {
+        // TODO:
+        // read file per line
+        // first line: accounts
+        // for each line:
+        //     map_value of the value without the EUR
+        //     set value of the asset in col 1
+        //     map asset to account, to know in which col to write the value
+        // 
+        Ok(true)
+    }
+
+    fn map_asset_col_idx(asset: &str) -> Result<i32, Error>
+    {
+        // TODO: read json with mappings?
+        // {[
+        //     { "assets:asset1": "account00" },
+        //     { "assets:asset2": "account01" },
+        //     { "assets:asset3": "account02" },
+        //     { "assets:asset4": "account00" },
+        // ]} 
+        match asset
+        {
+            "assets:asset1" => Ok(1),
+            "assets:asset2" => Ok(2),
+            "assets:asset3" => Ok(3),
+            _ => panic!("Unknown asset, check asset_mapping.json"), // TODO: Implement custom error handling correctly
+        }
     }
 
     fn map_value(avalue: f64) -> Result<i32, Error>
