@@ -60,6 +60,21 @@ pub mod investment_heatmap
         Ok(true)
     }
 
+    fn map_value(avalue: f64) -> Result<i32, Error>
+    {
+        // TODO: switch ranges.
+        match avalue
+        {
+            0.0..=9999.0 => Ok(0),
+            10000.0..=24999.0 => Ok(1),
+            25000.0..=49999.0 => Ok(2),
+            50000.0..=74999.0 => Ok(3),
+            75000.0..=99999.0 => Ok(4),
+            99999.0.. => Ok(5),
+            _ => panic!("Unknown range"), // TODO: Implement custom error handling correctly
+        }
+    }
+
     pub fn plot_data(
         afile: &str,
         apricedb: &str,
