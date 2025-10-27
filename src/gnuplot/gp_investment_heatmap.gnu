@@ -14,7 +14,7 @@
 # tbd,0,0,0,0,0
 
 set terminal pngcairo size 1900, 1080 enhanced font "Inconsolata,12"
-set output 'heatmap.png'
+set output 'investment_heatmap.png'
 unset key
 set view map scale 1
 set style data lines
@@ -39,7 +39,7 @@ set palette positive nops_allcF maxcolors 6 gamma 1.5 color model RGB
 set palette defined (0 "#FFFFFF", 1 "#EEDDEE", 2 "#D9B2D9", 3 "#C488C4", 4 "#A850A8", 5 "#800080") 
 set colorbox vertical origin screen 0.9, 0.2 size screen 0.05, 0.6 front noinvert bdefault
 
-set title "Heat map portfolio" font "Inconsolata,18"
+set title "Heat map investments" font "Inconsolata,18"
 set datafile separator comma
-plot '/tmp/ledgerplot/heatmap.dat' matrix rowheaders columnheaders using 1:2:3 with image
+plot '/tmp/ledgerplot/investment_heatmap.dat' matrix rowheaders columnheaders using 1:2:3 with image
 set datafile separator

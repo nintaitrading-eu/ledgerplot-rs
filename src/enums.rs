@@ -11,7 +11,7 @@ pub mod plot
         IncomePerCategory,
         ExpensesPerCategory,
         WealthGrowth,
-        IncomeHeatmap,
+        InvestmentHeatmap,
     }
 
     /*impl PlotType
@@ -45,7 +45,7 @@ pub mod plot
                 "IncomePerCategory" => Ok(PlotType::IncomePerCategory),
                 "ExpensesPerCategory" => Ok(PlotType::ExpensesPerCategory),
                 "WealthGrowth" => Ok(PlotType::WealthGrowth),
-                "IncomeHeatmap" => Ok(PlotType::IncomeHeatmap),
+                "InvestmentHeatmap" => Ok(PlotType::InvestmentHeatmap),
                 _ => Err(()),
             }
         }

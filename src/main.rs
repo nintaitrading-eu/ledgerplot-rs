@@ -6,7 +6,7 @@ mod passive_income_vs_expenses;
 mod wealthgrowth;
 mod expenses_per_category;
 mod income_per_category;
-mod income_heatmap;
+mod investment_heatmap;
 
 use docopt::Docopt;
 use enums::plot;
@@ -21,7 +21,7 @@ const USAGE: &'static str = "
 Ledgerplot.
 
 Usage:
-    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|IncomeHeatMap>
+    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|InvestmentHeatMap>
     ledgerplot --help
     ledgerplot --version
 
@@ -30,7 +30,7 @@ Options:
     --pricedb=<file_name>       Price database file to use.
     --startyear=<year_start>    Plot from this year.
     --endyear=<year_end>        Plot until this year (inclusive).
-    --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|IncomeHeatMap>                          Create the given plot type.
+    --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|InvestmentHeatMap>                          Create the given plot type.
     -h --help                   Show this screen.
     --version                   Show version.
 ";
@@ -112,7 +112,7 @@ fn main() -> Result<(), Error>
         }
     };
 
-    cleanup(); // Remove temporary files
+    //cleanup(); // Remove temporary files
     std::process::exit(0);
 }
 
@@ -182,11 +182,11 @@ fn plot_data(
             Err(e) => return Err(e),
         };
     }
-    if *aplot_type == plot::PlotType::IncomeHeatmap || *aplot_type == plot::PlotType::All
+    if *aplot_type == plot::PlotType::InvestmentHeatmap || *aplot_type == plot::PlotType::All
     {
-        match income_heatmap::income_heatmap::plot_data(afile, apricedb, astartyear, aendyear)
+        match investment_heatmap::investment_heatmap::plot_data(afile, apricedb)
         {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeHeatmap),
+            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap),
             Err(e) => return Err(e),
         };
     }
