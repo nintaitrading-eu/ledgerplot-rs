@@ -1,12 +1,12 @@
 pub mod wealthgrowth
 {
-    use TMPDIR;
+    use crate::TMPDIR;
     use std::env;
     use std::io::{Read,Write,Error};
     use std::fs::{File,OpenOptions};
     use std::path::PathBuf;
     use std::process::Command;
-    use enums::plot;
+    use crate::enums::plot;
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(quantity(scrub(display_total)),2)))\n";

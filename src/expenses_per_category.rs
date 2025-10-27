@@ -1,13 +1,13 @@
 pub mod expenses_per_category
 {
-    use TMPDIR;
+    use crate::TMPDIR;
     use std::env;
     use std::io::{Write,Error};
     use std::fs;
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
-    use enums::plot;
+    use crate::enums::plot;
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(partial_account(options.flat)) %(abs(quantity(scrub(display_total))))\n";

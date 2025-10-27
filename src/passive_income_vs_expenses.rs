@@ -1,12 +1,12 @@
 pub mod passive_income_vs_expenses
 {
-    use TMPDIR;
+    use crate::TMPDIR;
     use std::env;
     use std::io::{Write,Error};
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
-    use enums::plot;
+    use crate::enums::plot;
 
     const PLOT_TOTAL_FORMAT: &'static str =
         "%(format_date(date, \"%Y-%m-%d\")) %(abs(roundto(scrub(display_amount), 2)))\n";
