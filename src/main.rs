@@ -1,3 +1,7 @@
+/*
+ * main
+ *     The main starting point of the application.
+ */
 extern crate docopt;
 
 mod enums;
@@ -7,10 +11,11 @@ mod wealthgrowth;
 mod expenses_per_category;
 mod income_per_category;
 mod investment_heatmap;
+mod error_handler;
 
 use docopt::Docopt;
 use enums::plot;
-use std::io::Error;
+use error_handler::error;
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -36,7 +41,7 @@ Options:
 ";
 const TMPDIR: &'static str = "ledgerplot";
 
-fn main() -> Result<(), Error>
+fn main()
 {
     let args = Docopt::new(USAGE)
         .and_then(|dopt| dopt.parse())
@@ -116,22 +121,18 @@ fn main() -> Result<(), Error>
     std::process::exit(0);
 }
 
-fn prepare_temp_dir() -> Result<bool, Error>
+fn prepare_temp_dir() -> Result<(), error::ApplicationError>
 {
     let paths = [env::temp_dir(), Path::new(TMPDIR).to_path_buf()];
     let tmpdir: PathBuf = paths.iter().collect();
     let tmpdir_str = tmpdir.to_str().unwrap();
     if Path::new(&tmpdir_str).exists()
     {
-       return Ok(true);
+       return Ok(());
     }
 
-    match fs::create_dir_all(&tmpdir_str)
-    {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-    Ok(true)
+    fs::create_dir_all(&tmpdir_str).map_err(error::ApplicationError::IoError)?;
+    Ok(())
 }
 
 fn plot_data(
@@ -140,57 +141,45 @@ fn plot_data(
     aplot_type: &plot::PlotType,
     astartyear: i32,
     aendyear: i32,
-) -> Result<bool, Error>
+) -> Result<(), error::ApplicationError>
 {
     if *aplot_type == plot::PlotType::IncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        match income_vs_expenses::income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses),
-            Err(e) => return Err(e),
-        };
+        income_vs_expenses::income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
+            .map_err(error::ApplicationError::PlottingError)?;
+        println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses);
     }
     if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        match passive_income_vs_expenses::passive_income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses),
-            Err(e) => return Err(e),
-        };
+        passive_income_vs_expenses::passive_income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
+            .map_err(error::ApplicationError::PlottingError)?;
+        println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses);
     }
     if *aplot_type == plot::PlotType::WealthGrowth || *aplot_type == plot::PlotType::All
     {
-        match wealthgrowth::wealthgrowth::plot_data(afile, apricedb, astartyear, aendyear)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth),
-            Err(e) => return Err(e),
-        };
+        wealthgrowth::wealthgrowth::plot_data(afile, apricedb, astartyear, aendyear)
+            .map_err(error::ApplicationError::PlottingError)?;
+        println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth);
     }
     if *aplot_type == plot::PlotType::ExpensesPerCategory || *aplot_type == plot::PlotType::All
     {
-        match expenses_per_category::expenses_per_category::plot_data(afile, apricedb, astartyear, aendyear)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
-            Err(e) => return Err(e),
-        };
+        expenses_per_category::expenses_per_category::plot_data(afile, apricedb, astartyear, aendyear)
+            .map_err(error::ApplicationError::PlottingError)?;
+        println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory);
     }
     if *aplot_type == plot::PlotType::IncomePerCategory || *aplot_type == plot::PlotType::All
     {
-        match income_per_category::income_per_category::plot_data(afile, apricedb, astartyear, aendyear)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::IncomePerCategory),
-            Err(e) => return Err(e),
-        };
+        income_per_category::income_per_category::plot_data(afile, apricedb, astartyear, aendyear)
+            .map_err(error::ApplicationError::PlottingError)?;
+        println!("Data for {:?} prepared.", plot::PlotType::IncomePerCategory);
     }
     if *aplot_type == plot::PlotType::InvestmentHeatmap || *aplot_type == plot::PlotType::All
     {
-        match investment_heatmap::investment_heatmap::plot_data(afile, apricedb)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap),
-            Err(e) => return Err(e),
-        };
+        investment_heatmap::investment_heatmap::plot_data(afile, apricedb)
+            .map_err(error::ApplicationError::PlottingError)?;
+        println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
     }
-    Ok(true)
+    Ok(())
 }
 
 fn cleanup()

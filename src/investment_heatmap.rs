@@ -1,6 +1,12 @@
+/*
+ * investment_heatmap
+ *     Creates a heatmap of investments.
+ *     It uses account names and asset names from the asset_mapping.json file.
+ */
 pub mod investment_heatmap
 {
     use crate::TMPDIR;
+    use crate::error_handler::error;
     use std::env;
     use std::io::{Write,Error};
     use std::fs::File;
@@ -16,7 +22,7 @@ pub mod investment_heatmap
     fn prepare_data(
         afile: &str,
         apricedb: &str,
-    ) -> Result<bool, Error>
+    ) -> Result<(), error::ApplicationError>
     {
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
@@ -43,11 +49,8 @@ pub mod investment_heatmap
         let path_raw_str = path_raw.to_str().unwrap();
 
         let mut output_raw = File::create(path_raw_str)?;
-        match output_raw.write_all(&output1)
-        {
-            Ok(_) => println!("Wrote data to {}.", path_raw_str),
-            Err(e) => return Err(e),
-        };
+        output_raw.write_all(&output1).map_err(error::ApplicationError::IoError)?;
+        println!("Wrote data to {}.", path_raw_str);
 
         // TODO: convert the lines in the file from
         // 12.00 EUR assets:stock:xyz
@@ -59,16 +62,13 @@ pub mod investment_heatmap
         // Needs a mapper: value range -> int value 1 - 5
         let path_converted: PathBuf = env::temp_dir().join(TMPDIR).join(DAT_CONVERTED);
         let path_converted_str = path_converted.to_str().unwrap();
-        match convert_data(&path_raw_str)
-        {
-            Ok(_) => println!("Wrote converted data to {}.", path_converted_str),
-            Err(e) => return Err(e), // TODO: Custom error handling
-        }
+        convert_data(&path_raw_str).map_err(error::ApplicationError::ConversionError)?;
+        println!("Wrote converted data to {}.", path_converted_str);
 
-        Ok(true)
+        Ok(())
     }
 
-    fn convert_data(afile: &str) -> Result<bool, Error>
+    fn convert_data(afile: &str) -> Result<(), error::ApplicationError>
     {
         // TODO:
         // read file per line
@@ -78,10 +78,11 @@ pub mod investment_heatmap
         //     set value of the asset in col 1
         //     map asset to account, to know in which col to write the value
         // 
-        Ok(true)
+        Err(error::ApplicationError::ConversionError);
+        //Ok(())
     }
 
-    fn map_asset_col_idx(asset: &str) -> Result<i32, Error>
+    fn map_asset_col_idx(asset: &str) -> Result<i32, error::ApplicationError>
     {
         // TODO: read json with mappings?
         // {[
@@ -95,13 +96,12 @@ pub mod investment_heatmap
             "assets:asset1" => Ok(1),
             "assets:asset2" => Ok(2),
             "assets:asset3" => Ok(3),
-            _ => panic!("Unknown asset, check asset_mapping.json"), // TODO: Implement custom error handling correctly
+            _ => Err(error::ApplicationError::UnknownAssetError(asset.to_string())),
         }
     }
 
-    fn map_value(avalue: f64) -> Result<i32, Error>
+    fn map_value(avalue: f64) -> Result<i32, error::ApplicationError>
     {
-        // TODO: switch ranges.
         match avalue
         {
             0.0..=9999.0 => Ok(0),
@@ -110,28 +110,23 @@ pub mod investment_heatmap
             50000.0..=74999.0 => Ok(3),
             75000.0..=99999.0 => Ok(4),
             99999.0.. => Ok(5),
-            _ => panic!("Unknown range"), // TODO: Implement custom error handling correctly
+            _ => Err(error::ApplicationError::ValueOutOfRangeError(avalue.to_string())),
         }
     }
 
     pub fn plot_data(
         afile: &str,
         apricedb: &str,
-    ) -> Result<bool, Error>
+    ) -> Result<(), error::ApplicationError>
     {
-        match prepare_data(afile, apricedb)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap),
-            Err(e) => return Err(e),
-        };
+        prepare_data(afile, apricedb).map_err(error::ApplicationError::PrepareDataError)?;
+        println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
 
-        match Command::new("gnuplot")
+        Command::new("gnuplot")
             .arg("/usr/local/share/ledgerplot/gp_investment_heatmap.gnu")
             .status()
-        {
-            Ok(_) => println!("Created gnuplot output."),
-            Err(e) => return Err(e),
-        };
-        Ok(true)
+            .map_err(error::ApplicationError::PlottingError)?;
+        println!("Created gnuplot output.");
+        Ok(())
     }
 }
