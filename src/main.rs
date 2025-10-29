@@ -18,6 +18,7 @@ mod config_handler;
 mod data_handler;
 
 use docopt::Docopt;
+use consts::const_;
 use enums::plot;
 use models::model;
 use error_handler::error;
@@ -28,40 +29,16 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 
-const VERSION: &'static str = "0.1.2";
-const USAGE: &'static str = "
-Ledgerplot.
-
-Usage:
-    ledgerplot --file=<file_name> --pricedb=<file_name> --startyear=<year_start> --endyear=<year_end> --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|InvestmentHeatMap>
-    ledgerplot --help
-    ledgerplot --version
-
-Options:
-    --file=<file_name>          Ledger dat file to use.
-    --pricedb=<file_name>       Price database file to use.
-    --startyear=<year_start>    Plot from this year.
-    --endyear=<year_end>        Plot until this year (inclusive).
-    --type=<All|IncomeVsExpenses|PassiveIncomeVsExpenses|IncomePerCategory|ExpensesPerCategory|WealthGrowth|InvestmentHeatMap>                          Create the given plot type.
-    -h --help                   Show this screen.
-    --version                   Show version.
-";
-const TMPDIR: &'static str = "ledgerplot";
-
 fn main()
 {
-    let mut mapping = model::Mapping
-    {
-        records: vec![model::Account { ..Default::default() }],
-        ..Default::default()
-    };
+    let mut mapping = model::Mapping::default();
 
     match config::ensure_mapping(&mut mapping)
     {
         Ok(()) => (),
         Err(ex) =>
         {
-            println!("Error: {}", ex);
+            println!("Error ensuring mapping: {}", ex);
             std::process::exit(1);
         }
     }
@@ -72,18 +49,18 @@ fn main()
         Ok(None) => mapping,
         Err(ex) =>
         {
-            println!("Error: {}", ex);
+            println!("Error loading mapping: {}", ex);
             std::process::exit(1);
         }
     };
 
-    let args = Docopt::new(USAGE)
+    let args = Docopt::new(const_::USAGE)
         .and_then(|dopt| dopt.parse())
         .unwrap_or_else(|e| e.exit());
 
     if args.get_bool("--version")
     {
-        println!("Ledgerplot v{}", VERSION);
+        println!("Ledgerplot v{}", const_::VERSION);
         std::process::exit(0);
     };
 
@@ -157,7 +134,7 @@ fn main()
 
 fn prepare_temp_dir() -> Result<(), error::ApplicationError>
 {
-    let paths = [env::temp_dir(), Path::new(TMPDIR).to_path_buf()];
+    let paths = [env::temp_dir(), Path::new(const_::TMPDIR).to_path_buf()];
     let tmpdir: PathBuf = paths.iter().collect();
     let tmpdir_str = tmpdir.to_str().unwrap();
     if Path::new(&tmpdir_str).exists()
@@ -215,7 +192,7 @@ fn cleanup()
     for path in fs::read_dir(env::temp_dir()).unwrap()
     {
         let path = path.unwrap().path();
-        if path.file_stem() == Some(OsStr::new(TMPDIR))
+        if path.file_stem() == Some(OsStr::new(const_::TMPDIR))
         {
             fs::remove_dir_all(path).unwrap();
         }

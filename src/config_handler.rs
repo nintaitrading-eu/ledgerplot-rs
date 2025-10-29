@@ -41,7 +41,32 @@ pub mod config
         {
             let model = model::Mapping
             {
-                records: vec![model::Account { ..Default::default() }],
+                records: vec![
+                    model::Account
+                    {
+                        name: "testaccount1".to_string(),
+                        assets: vec![
+                            model::Asset
+                            {
+                                name: "testasset1".to_string()
+                            },
+                            model::Asset
+                            {
+                                name: "testasset2".to_string()
+                            }],
+                            ..Default::default()
+                    },
+                    model::Account
+                    {
+                        name: "testaccount2".to_string(),
+                        assets: vec![
+                            model::Asset
+                            {
+                                name: "testasset3".to_string()
+                            }],
+                            ..Default::default()
+                    }
+                ],
                 ..Default::default()
             };
             save(model)?;

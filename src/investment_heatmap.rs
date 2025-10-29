@@ -5,7 +5,7 @@
  */
 pub mod investment_heatmap
 {
-    use crate::TMPDIR;
+    use crate::consts::const_;
     use crate::error_handler::error;
     use std::env;
     use std::io::Write;
@@ -48,7 +48,7 @@ pub mod investment_heatmap
             .expect("Failed to execute ledger command for output1.")
             .stdout;
 
-        let path_raw: PathBuf = env::temp_dir().join(TMPDIR).join(DAT_RAW);
+        let path_raw: PathBuf = env::temp_dir().join(const_::TMPDIR).join(DAT_RAW);
         let path_raw_str = path_raw.to_str().unwrap();
 
         let mut output_raw = File::create(path_raw_str).map_err(error::ApplicationError::IoError)?;
@@ -63,7 +63,7 @@ pub mod investment_heatmap
         // ,account01,account02,... (note empmty first col)
         // Needs a mapper: asset name -> account (name + col idx)
         // Needs a mapper: value range -> int value 1 - 5
-        let path_converted: PathBuf = env::temp_dir().join(TMPDIR).join(DAT_CONVERTED);
+        let path_converted: PathBuf = env::temp_dir().join(const_::TMPDIR).join(DAT_CONVERTED);
         let path_converted_str = path_converted.to_str().unwrap();
         convert_data(&path_raw_str)?;
         println!("Wrote converted data to {}.", path_converted_str);

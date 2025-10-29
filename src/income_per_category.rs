@@ -1,6 +1,6 @@
 pub mod income_per_category
 {
-    use crate::TMPDIR;
+    use crate::consts::const_;
     use crate::error_handler::error;
     use std::env;
     use std::io::Write;
@@ -47,7 +47,7 @@ pub mod income_per_category
             .expect("Failed to execute ledger command for output1.")
             .stdout;
 
-        let path1: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT1);
+        let path1: PathBuf = env::temp_dir().join(const_::TMPDIR).join(FILE_OUTPUT1);
         let path1_str = path1.to_str().unwrap();
 
         let mut output_file1 = File::create(path1_str).map_err(error::ApplicationError::IoError)?;

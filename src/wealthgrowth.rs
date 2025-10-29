@@ -1,6 +1,6 @@
 pub mod wealthgrowth
 {
-    use crate::TMPDIR;
+    use crate::consts::const_;
     use crate::error_handler::error;
     use std::env;
     use std::io::{Read,Write};
@@ -93,11 +93,11 @@ pub mod wealthgrowth
             .expect("Failed to execute ledger command for output3.")
             .stdout;
 
-        let path1: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT1);
+        let path1: PathBuf = env::temp_dir().join(const_::TMPDIR).join(FILE_OUTPUT1);
         let path1_str = path1.to_str().unwrap();
-        let path2: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT2);
+        let path2: PathBuf = env::temp_dir().join(const_::TMPDIR).join(FILE_OUTPUT2);
         let path2_str = path2.to_str().unwrap();
-        let path3: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT3);
+        let path3: PathBuf = env::temp_dir().join(const_::TMPDIR).join(FILE_OUTPUT3);
         let path3_str = path3.to_str().unwrap();
 
         let mut output_file1 = File::create(path1_str).map_err(error::ApplicationError::IoError)?;

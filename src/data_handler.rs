@@ -1,6 +1,6 @@
 /*
  * data_handler
- *     Loads and saves the data of the kanban issues created via the application.
+ *     Loads and saves data from files.
  */
 pub mod data 
 {
@@ -14,14 +14,13 @@ pub mod data
     pub fn load(model: &mut model::Mapping) -> Result<Option<model::Mapping>, error::ApplicationError>
     {
         let json_data = fs::read_to_string(config::get_mapping_file()).map_err(error::ApplicationError::IoError)?;
-        let i: Vec<model::Account> = serde_json::from_str(&json_data).map_err(error::ApplicationError::JsonError)?;
-        model.records = i;
-        Ok(Some(model.clone()))
+        let m: model::Mapping = serde_json::from_str(&json_data).map_err(error::ApplicationError::JsonError)?;
+        Ok(Some(m.clone()))
     }
 
     pub fn save(model: &mut model::Mapping) -> Result<(), error::ApplicationError>
     {
-        let json_data = serde_json::to_string_pretty(&model.records).unwrap();
+        let json_data = serde_json::to_string_pretty(&model).unwrap();
         let mut file = File::create(config::get_mapping_file()).map_err(error::ApplicationError::IoError)?;
         file.write_all(json_data.as_bytes()).map_err(error::ApplicationError::IoError)?;
         Ok(())
