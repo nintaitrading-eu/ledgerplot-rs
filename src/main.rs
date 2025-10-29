@@ -4,7 +4,9 @@
  */
 extern crate docopt;
 
+mod consts;
 mod enums;
+mod models;
 mod income_vs_expenses;
 mod passive_income_vs_expenses;
 mod wealthgrowth;
@@ -12,10 +14,15 @@ mod expenses_per_category;
 mod income_per_category;
 mod investment_heatmap;
 mod error_handler;
+mod config_handler;
+mod data_handler;
 
 use docopt::Docopt;
 use enums::plot;
+use models::model;
 use error_handler::error;
+use config_handler::config;
+use data_handler::data;
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -43,6 +50,33 @@ const TMPDIR: &'static str = "ledgerplot";
 
 fn main()
 {
+    let mut mapping = model::Mapping
+    {
+        records: vec![model::Account { ..Default::default() }],
+        ..Default::default()
+    };
+
+    match config::ensure_mapping(&mut mapping)
+    {
+        Ok(()) => (),
+        Err(ex) =>
+        {
+            println!("Error: {}", ex);
+            std::process::exit(1);
+        }
+    }
+
+    mapping = match data::load(&mut mapping)
+    {
+        Ok(Some(m)) => m,
+        Ok(None) => mapping,
+        Err(ex) =>
+        {
+            println!("Error: {}", ex);
+            std::process::exit(1);
+        }
+    };
+
     let args = Docopt::new(USAGE)
         .and_then(|dopt| dopt.parse())
         .unwrap_or_else(|e| e.exit());
