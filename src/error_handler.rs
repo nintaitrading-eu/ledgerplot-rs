@@ -27,9 +27,6 @@ pub mod error
         #[error("Value out of range: {0}")]
         ValueOutOfRangeError(String),
 
-        #[error("Preparation of data failed.")]
-        PrepareDataError,
-
         #[error("Plotting failed.")]
         PlottingError,
 

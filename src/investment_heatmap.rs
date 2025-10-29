@@ -8,7 +8,7 @@ pub mod investment_heatmap
     use crate::TMPDIR;
     use crate::error_handler::error;
     use std::env;
-    use std::io::{Write,Error};
+    use std::io::Write;
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
@@ -22,6 +22,7 @@ pub mod investment_heatmap
     fn prepare_data(
         afile: &str,
         apricedb: &str,
+        aendyear: i32
     ) -> Result<(), error::ApplicationError>
     {
         let output1: std::vec::Vec<u8> = Command::new("ledger")
@@ -33,6 +34,8 @@ pub mod investment_heatmap
             .arg("-X")
             .arg("EUR")
             .arg("--real")
+            .arg("-e")
+            .arg((aendyear + 1).to_string())
             .arg("bal")
             .arg("assets:stock")
             .arg("assets:etf")
@@ -62,7 +65,7 @@ pub mod investment_heatmap
         // Needs a mapper: value range -> int value 1 - 5
         let path_converted: PathBuf = env::temp_dir().join(TMPDIR).join(DAT_CONVERTED);
         let path_converted_str = path_converted.to_str().unwrap();
-        convert_data(&path_raw_str).map_err(error::ApplicationError::ConversionError)?;
+        convert_data(&path_raw_str)?;
         println!("Wrote converted data to {}.", path_converted_str);
 
         Ok(())
@@ -78,7 +81,7 @@ pub mod investment_heatmap
         //     set value of the asset in col 1
         //     map asset to account, to know in which col to write the value
         // 
-        Err(error::ApplicationError::ConversionError);
+        Err(error::ApplicationError::ConversionError)
         //Ok(())
     }
 
@@ -117,15 +120,15 @@ pub mod investment_heatmap
     pub fn plot_data(
         afile: &str,
         apricedb: &str,
+        aendyear: i32
     ) -> Result<(), error::ApplicationError>
     {
-        prepare_data(afile, apricedb).map_err(error::ApplicationError::PrepareDataError)?;
+        prepare_data(afile, apricedb, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
 
         Command::new("gnuplot")
             .arg("/usr/local/share/ledgerplot/gp_investment_heatmap.gnu")
-            .status()
-            .map_err(error::ApplicationError::PlottingError)?;
+            .status()?;
         println!("Created gnuplot output.");
         Ok(())
     }

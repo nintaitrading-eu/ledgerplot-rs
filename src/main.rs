@@ -145,38 +145,32 @@ fn plot_data(
 {
     if *aplot_type == plot::PlotType::IncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        income_vs_expenses::income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
-            .map_err(error::ApplicationError::PlottingError)?;
+        income_vs_expenses::income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::IncomeVsExpenses);
     }
     if *aplot_type == plot::PlotType::PassiveIncomeVsExpenses || *aplot_type == plot::PlotType::All
     {
-        passive_income_vs_expenses::passive_income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)
-            .map_err(error::ApplicationError::PlottingError)?;
+        passive_income_vs_expenses::passive_income_vs_expenses::plot_data(afile, apricedb, astartyear, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses);
     }
     if *aplot_type == plot::PlotType::WealthGrowth || *aplot_type == plot::PlotType::All
     {
-        wealthgrowth::wealthgrowth::plot_data(afile, apricedb, astartyear, aendyear)
-            .map_err(error::ApplicationError::PlottingError)?;
+        wealthgrowth::wealthgrowth::plot_data(afile, apricedb, astartyear, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth);
     }
     if *aplot_type == plot::PlotType::ExpensesPerCategory || *aplot_type == plot::PlotType::All
     {
-        expenses_per_category::expenses_per_category::plot_data(afile, apricedb, astartyear, aendyear)
-            .map_err(error::ApplicationError::PlottingError)?;
+        expenses_per_category::expenses_per_category::plot_data(afile, apricedb, astartyear, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory);
     }
     if *aplot_type == plot::PlotType::IncomePerCategory || *aplot_type == plot::PlotType::All
     {
-        income_per_category::income_per_category::plot_data(afile, apricedb, astartyear, aendyear)
-            .map_err(error::ApplicationError::PlottingError)?;
+        income_per_category::income_per_category::plot_data(afile, apricedb, astartyear, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::IncomePerCategory);
     }
     if *aplot_type == plot::PlotType::InvestmentHeatmap || *aplot_type == plot::PlotType::All
     {
-        investment_heatmap::investment_heatmap::plot_data(afile, apricedb)
-            .map_err(error::ApplicationError::PlottingError)?;
+        investment_heatmap::investment_heatmap::plot_data(afile, apricedb, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
     }
     Ok(())
