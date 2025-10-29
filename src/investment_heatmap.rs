@@ -51,7 +51,7 @@ pub mod investment_heatmap
         let path_raw: PathBuf = env::temp_dir().join(TMPDIR).join(DAT_RAW);
         let path_raw_str = path_raw.to_str().unwrap();
 
-        let mut output_raw = File::create(path_raw_str)?;
+        let mut output_raw = File::create(path_raw_str).map_err(error::ApplicationError::IoError)?;
         output_raw.write_all(&output1).map_err(error::ApplicationError::IoError)?;
         println!("Wrote data to {}.", path_raw_str);
 
@@ -130,6 +130,7 @@ pub mod investment_heatmap
             .arg("/usr/local/share/ledgerplot/gp_investment_heatmap.gnu")
             .status()?;
         println!("Created gnuplot output.");
+
         Ok(())
     }
 }

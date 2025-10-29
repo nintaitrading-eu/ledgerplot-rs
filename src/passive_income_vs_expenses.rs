@@ -1,6 +1,7 @@
 pub mod passive_income_vs_expenses
 {
     use crate::TMPDIR;
+    use crate::error_handler::error;
     use std::env;
     use std::io::{Write,Error};
     use std::fs::File;
@@ -18,7 +19,7 @@ pub mod passive_income_vs_expenses
         apricedb: &str,
         astartyear: i32,
         aendyear: i32,
-    ) -> Result<bool, Error>
+    ) -> Result<(), error::ApplicationError>
     {
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
@@ -81,20 +82,15 @@ pub mod passive_income_vs_expenses
         let path2: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT2);
         let path2_str= path2.to_str().unwrap();
 
-        let mut output_file1 = File::create(path1_str)?;
-        match output_file1.write_all(&output1)
-        {
-            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT1),
-            Err(e) => return Err(e),
-        };
+        let mut output_file1 = File::create(path1_str).map_err(error::ApplicationError::IoError)?;
+        output_file1.write_all(&output1).map_err(error::ApplicationError::IoError)?;
+        println!("Wrote data to {}.", FILE_OUTPUT1);
 
-        let mut output_file2 = File::create(path2_str)?;
-        match output_file2.write_all(&output2)
-        {
-            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT2),
-            Err(e) => return Err(e),
-        };
-        Ok(true)
+        let mut output_file2 = File::create(path2_str).map_err(error::ApplicationError::IoError)?;
+        output_file2.write_all(&output2).map_err(error::ApplicationError::IoError)?;
+        println!("Wrote data to {}.", FILE_OUTPUT2);
+
+        Ok(())
     }
 
     pub fn plot_data(
@@ -102,21 +98,16 @@ pub mod passive_income_vs_expenses
         apricedb: &str,
         astartyear: i32,
         aendyear: i32,
-    ) -> Result<bool, Error>
+    ) -> Result<(), error::ApplicationError>
     {
-        match prepare_data(afile, apricedb, astartyear, aendyear)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses),
-            Err(e) => return Err(e),
-        };
+        prepare_data(afile, apricedb, astartyear, aendyear)?;
+        println!("Data for {:?} prepared.", plot::PlotType::PassiveIncomeVsExpenses);
 
-        match Command::new("gnuplot")
+        Command::new("gnuplot")
             .arg("/usr/local/share/ledgerplot/gp_passive_income_vs_expenses.gnu")
-            .status()
-        {
-            Ok(_) => println!("Created gnuplot output."),
-            Err(e) => return Err(e),
-        };
-        Ok(true)
+            .status()?;
+        println!("Created gnuplot output.");
+
+        Ok(())
     }
 }

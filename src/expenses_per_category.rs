@@ -1,8 +1,9 @@
 pub mod expenses_per_category
 {
     use crate::TMPDIR;
+    use crate::error_handler::error;
     use std::env;
-    use std::io::{Write,Error};
+    use std::io::Write;
     use std::fs;
     use std::fs::File;
     use std::path::PathBuf;
@@ -20,7 +21,7 @@ pub mod expenses_per_category
         afile: &str,
         apricedb: &str,
         ayear: i32
-    ) -> Result<bool, Error>
+    ) -> Result<(), error::ApplicationError>
     {
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
@@ -49,14 +50,11 @@ pub mod expenses_per_category
         let path1: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT1);
         let path1_str = path1.to_str().unwrap();
 
-        let mut output_file1 = File::create(path1_str)?;
-        match output_file1.write_all(&output1)
-        {
-            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT1),
-            Err(e) => return Err(e),
-        };
+        let mut output_file1 = File::create(path1_str).map_err(error::ApplicationError::IoError)?;
+        output_file1.write_all(&output1).map_err(error::ApplicationError::IoError)?;
+        println!("Wrote data to {}.", FILE_OUTPUT1);
 
-        Ok(true)
+        Ok(())
     }
 
     pub fn plot_data(
@@ -64,35 +62,27 @@ pub mod expenses_per_category
         apricedb: &str,
         astartyear: i32,
         aendyear: i32,
-    ) -> Result<bool, Error>
+    ) -> Result<(), error::ApplicationError>
     {
         for year in astartyear .. aendyear + 1
         {
-            match prepare_data(afile, apricedb, year)
-            {
-                Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory),
-                Err(e) => return Err(e),
-            }
+            prepare_data(afile, apricedb, year)?;
+            println!("Data for {:?} prepared.", plot::PlotType::ExpensesPerCategory);
 
-            match Command::new("gnuplot")
+            Command::new("gnuplot")
                 .arg("/usr/local/share/ledgerplot/gp_expenses_per_category.gnu")
-                .status()
-            {
-                Ok(_) => println!("Created gnuplot output."),
-                Err(e) => return Err(e),
-            }
+                .status()?;
+            println!("Created gnuplot output.");
 
             let output_file = FILE_OUTPUT_FINAL
                 .to_string()
                 .to_lowercase()
                 .replace(".png", &format!("_{}.png", year));
 
-            match fs::rename(FILE_OUTPUT_FINAL, &output_file)
-            {
-                Ok(_) => println!("Wrote data to {}.", &output_file),
-                Err(e) => println!("Error writing data: {}", e),
-            };
+            fs::rename(FILE_OUTPUT_FINAL, &output_file)?;
+            println!("Wrote data to {}.", &output_file);
         }
-        Ok(true)
+
+        Ok(())
     }
 }

@@ -1,8 +1,9 @@
 pub mod wealthgrowth
 {
     use crate::TMPDIR;
+    use crate::error_handler::error;
     use std::env;
-    use std::io::{Read,Write,Error};
+    use std::io::{Read,Write};
     use std::fs::{File,OpenOptions};
     use std::path::PathBuf;
     use std::process::Command;
@@ -19,7 +20,7 @@ pub mod wealthgrowth
         apricedb: &str,
         astartyear: i32,
         aendyear: i32,
-    ) -> Result<bool, Error>
+    ) -> Result<(), error::ApplicationError>
     {
         let output1: std::vec::Vec<u8> = Command::new("ledger")
             .arg("-f")
@@ -99,51 +100,39 @@ pub mod wealthgrowth
         let path3: PathBuf = env::temp_dir().join(TMPDIR).join(FILE_OUTPUT3);
         let path3_str = path3.to_str().unwrap();
 
-        let mut output_file1 = File::create(path1_str)?;
-        match output_file1.write_all(&output1)
-        {
-            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT1),
-            Err(e) => return Err(e),
-        };
+        let mut output_file1 = File::create(path1_str).map_err(error::ApplicationError::IoError)?;
+        output_file1.write_all(&output1).map_err(error::ApplicationError::IoError)?;
+        println!("Wrote data to {}.", FILE_OUTPUT1);
 
-        let mut output_file2 = File::create(path2_str)?;
-        match output_file2.write_all(&output2)
-        {
-            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT2),
-            Err(e) => return Err(e),
-        };
+        let mut output_file2 = File::create(path2_str).map_err(error::ApplicationError::IoError)?;
+        output_file2.write_all(&output2).map_err(error::ApplicationError::IoError)?;
+        println!("Wrote data to {}.", FILE_OUTPUT2);
 
-        let mut output_file3 = File::create(path3_str)?;
-        match output_file3.write_all(&output3)
-        {
-            Ok(_) => println!("Wrote data to {}.", FILE_OUTPUT3),
-            Err(e) => return Err(e),
-        };
-        Ok(true)
+        let mut output_file3 = File::create(path3_str).map_err(error::ApplicationError::IoError)?;
+        output_file3.write_all(&output3).map_err(error::ApplicationError::IoError)?;
+        println!("Wrote data to {}.", FILE_OUTPUT3);
+
+        Ok(())
     }
 
     pub fn plot_data(
         afile: &str,
         apricedb: &str,
         astartyear: i32,
-        aendyear: i32) -> Result<bool, Error>
+        aendyear: i32
+    ) -> Result<(), error::ApplicationError>
     {
-        match prepare_data(afile, apricedb, astartyear, aendyear)
-        {
-            Ok(_) => println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth),
-            Err(e) => return Err(e),
-        };
+        prepare_data(afile, apricedb, astartyear, aendyear)?;
+        println!("Data for {:?} prepared.", plot::PlotType::WealthGrowth);
 
         let script_without_xrange = "/usr/local/share/ledgerplot/gp_wealthgrowth.gnu";
         let script_with_xrange: &str = "/tmp/ledgerplot/wealthgrowth.gnu";
 
         let xrange_line = format!("set xdata time\nset timefmt \"%Y-%m-%d\"\nset xrange [\"{}-01-01\":\"{}-12-31\"]\n", astartyear.to_string(), aendyear.to_string());
-        let mut script_with_xrange_file = File::create(script_with_xrange)?;
-        match script_with_xrange_file.write_all(&xrange_line.as_bytes())
-        {
-            Ok(_) => println!("Wrote gnuplot script_with_xrange."),
-            Err(e) => return Err(e),
-        };
+        let mut script_with_xrange_file = File::create(script_with_xrange).map_err(error::ApplicationError::IoError)?;
+        script_with_xrange_file.write_all(&xrange_line.as_bytes()).map_err(error::ApplicationError::IoError)?;
+        println!("Wrote gnuplot script_with_xrange.");
+
         let mut file_in = std::fs::File::open(script_without_xrange).unwrap();
         let mut file_out = OpenOptions::new().append(true).open(script_with_xrange).unwrap();
         let mut buffer = [0u8; 4096];
@@ -151,15 +140,16 @@ pub mod wealthgrowth
         {
             let nbytes = file_in.read(&mut buffer).unwrap();
             file_out.write(&buffer[..nbytes]).unwrap();
-            if nbytes < buffer.len() { break; }
+            if nbytes < buffer.len()
+            {
+                break;
+            }
         }
-        match Command::new("gnuplot")
+        Command::new("gnuplot")
             .arg(script_with_xrange)
-            .status()
-        {
-            Ok(_) => println!("Created gnuplot output."),
-            Err(e) => return Err(e),
-        };
-        Ok(true)
+            .status()?;
+        println!("Created gnuplot output.");
+
+        Ok(())
     }
 }
