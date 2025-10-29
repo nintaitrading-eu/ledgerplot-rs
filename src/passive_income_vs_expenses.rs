@@ -3,7 +3,7 @@ pub mod passive_income_vs_expenses
     use crate::TMPDIR;
     use crate::error_handler::error;
     use std::env;
-    use std::io::{Write,Error};
+    use std::io::Write;
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
