@@ -39,9 +39,7 @@ pub mod config
         let mapping_file: PathBuf = get_mapping_file();
         if !mapping_file.exists()
         {
-            let model = model::Mapping
-            {
-                records: vec![
+            model.records = vec![
                     model::Account
                     {
                         name: "testaccount1".to_string(),
@@ -66,16 +64,14 @@ pub mod config
                             }],
                             ..Default::default()
                     }
-                ],
-                ..Default::default()
-            };
-            save(model)?;
+                ];
+            save_mapping(model)?;
             println!("Mapping file does not exist yet, creating a default one at {:?}.", Path::new(mapping_file.as_path()));
         }
         Ok(())
     }
 
-    pub fn save(mapping: model::Mapping) -> Result<(), error::ApplicationError>
+    pub fn save_mapping(mapping: &mut model::Mapping) -> Result<(), error::ApplicationError>
     {
         let json_data = serde_json::to_string_pretty(&mapping).unwrap();
         let mut file = File::create(get_mapping_file()).map_err(error::ApplicationError::IoError)?;
@@ -83,10 +79,10 @@ pub mod config
         Ok(())
     }
 
-    pub fn load() -> Result<model::Mapping, error::ApplicationError>
+    pub fn load_mapping() -> Result<model::Mapping, error::ApplicationError>
     {
         let json_data = fs::read_to_string(get_mapping_file()).map_err(error::ApplicationError::IoError)?;
-        let i: model::Mapping = serde_json::from_str(&json_data).map_err(error::ApplicationError::JsonError)?;
-        Ok(i.clone())
+        let m: model::Mapping = serde_json::from_str(&json_data).map_err(error::ApplicationError::JsonError)?;
+        Ok(m.clone())
     }
 }

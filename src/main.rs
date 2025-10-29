@@ -23,7 +23,6 @@ use enums::plot;
 use models::model;
 use error_handler::error;
 use config_handler::config;
-use data_handler::data;
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -43,10 +42,9 @@ fn main()
         }
     }
 
-    mapping = match data::load(&mut mapping)
+    mapping = match config::load_mapping()
     {
-        Ok(Some(m)) => m,
-        Ok(None) => mapping,
+        Ok(m) => m,
         Err(ex) =>
         {
             println!("Error loading mapping: {}", ex);
