@@ -6,6 +6,7 @@
 pub mod investment_heatmap
 {
     use crate::consts::const_;
+    use crate::models::model;
     use crate::error_handler::error;
     use std::env;
     use std::io::Write;
@@ -118,6 +119,7 @@ pub mod investment_heatmap
     }
 
     pub fn plot_data(
+        mut mapping: model::Mapping,
         afile: &str,
         apricedb: &str,
         aendyear: i32

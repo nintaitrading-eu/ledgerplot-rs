@@ -116,7 +116,7 @@ fn main()
         }
     };
 
-    match plot_data(file, pricedb, &plot_type, startyear, endyear)
+    match plot_data(mapping, file, pricedb, &plot_type, startyear, endyear)
     {
         Ok(res) => res,
         Err(e) =>
@@ -145,6 +145,7 @@ fn prepare_temp_dir() -> Result<(), error::ApplicationError>
 }
 
 fn plot_data(
+    mut mapping: model::Mapping,
     afile: &str,
     apricedb: &str,
     aplot_type: &plot::PlotType,
@@ -179,7 +180,7 @@ fn plot_data(
     }
     if *aplot_type == plot::PlotType::InvestmentHeatmap || *aplot_type == plot::PlotType::All
     {
-        investment_heatmap::investment_heatmap::plot_data(afile, apricedb, aendyear)?;
+        investment_heatmap::investment_heatmap::plot_data(mapping, afile, apricedb, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
     }
     Ok(())
