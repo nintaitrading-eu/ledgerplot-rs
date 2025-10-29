@@ -27,4 +27,7 @@ pub mod const_
 
     // Mapping
     pub const JSON_MAPPING: &str = "mapping.json";
+
+    // Configuration
+    pub const JSON_CONFIG: &str = "config.json";
 }

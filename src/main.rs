@@ -30,6 +30,28 @@ use std::ffi::OsStr;
 
 fn main()
 {
+    let mut config = model::Configuration::default();
+
+    match config::ensure_config(&mut config)
+    {
+        Ok(()) => (),
+        Err(ex) =>
+        {
+            println!("Error ensuring config: {}", ex);
+            std::process::exit(1);
+        }
+    }
+
+    config = match config::load()
+    {
+        Ok(c) => c,
+        Err(ex) =>
+        {
+            println!("Error loading config: {}", ex);
+            std::process::exit(1);
+        }
+    };
+
     let mut mapping = model::Mapping::default();
 
     match config::ensure_mapping(&mut mapping)
@@ -116,7 +138,7 @@ fn main()
         }
     };
 
-    match plot_data(mapping, file, pricedb, &plot_type, startyear, endyear)
+    match plot_data(config, mapping, file, pricedb, &plot_type, startyear, endyear)
     {
         Ok(res) => res,
         Err(e) =>
@@ -145,7 +167,8 @@ fn prepare_temp_dir() -> Result<(), error::ApplicationError>
 }
 
 fn plot_data(
-    mut mapping: model::Mapping,
+    config: model::Configuration,
+    mapping: model::Mapping,
     afile: &str,
     apricedb: &str,
     aplot_type: &plot::PlotType,
@@ -180,7 +203,7 @@ fn plot_data(
     }
     if *aplot_type == plot::PlotType::InvestmentHeatmap || *aplot_type == plot::PlotType::All
     {
-        investment_heatmap::investment_heatmap::plot_data(mapping, afile, apricedb, aendyear)?;
+        investment_heatmap::investment_heatmap::plot_data(config, mapping, afile, apricedb, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
     }
     Ok(())

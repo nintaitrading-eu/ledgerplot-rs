@@ -8,6 +8,7 @@ pub mod investment_heatmap
     use crate::consts::const_;
     use crate::models::model;
     use crate::error_handler::error;
+    use crate::config_handler::config;
     use std::env;
     use std::io::Write;
     use std::fs::File;
@@ -21,6 +22,8 @@ pub mod investment_heatmap
     const DAT_CONVERTED: &'static str = "investment_heatmap.dat";
 
     fn prepare_data(
+        config: model::Configuration,
+        mapping: model::Mapping,
         afile: &str,
         apricedb: &str,
         aendyear: i32
@@ -66,6 +69,8 @@ pub mod investment_heatmap
         // Needs a mapper: value range -> int value 1 - 5
         let path_converted: PathBuf = env::temp_dir().join(const_::TMPDIR).join(DAT_CONVERTED);
         let path_converted_str = path_converted.to_str().unwrap();
+
+        // TODO: pass config/mapping
         convert_data(&path_raw_str)?;
         println!("Wrote converted data to {}.", path_converted_str);
 
@@ -82,6 +87,7 @@ pub mod investment_heatmap
         //     set value of the asset in col 1
         //     map asset to account, to know in which col to write the value
         // 
+        // TODO: pass config to map_value
         Err(error::ApplicationError::ConversionError)
         //Ok(())
     }
@@ -113,19 +119,21 @@ pub mod investment_heatmap
             25000.0..=49999.0 => Ok(2),
             50000.0..=74999.0 => Ok(3),
             75000.0..=99999.0 => Ok(4),
-            99999.0.. => Ok(5),
+            100000.0.. => Ok(5),
             _ => Err(error::ApplicationError::ValueOutOfRangeError(avalue.to_string())),
         }
     }
 
     pub fn plot_data(
-        mut mapping: model::Mapping,
+        config: model::Configuration,
+        mapping: model::Mapping,
         afile: &str,
         apricedb: &str,
         aendyear: i32
     ) -> Result<(), error::ApplicationError>
     {
-        prepare_data(afile, apricedb, aendyear)?;
+        println!("debug :: {:?}", mapping);
+        prepare_data(config, mapping, afile, apricedb, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
 
         Command::new("gnuplot")

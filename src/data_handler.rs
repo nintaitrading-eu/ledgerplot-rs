@@ -11,7 +11,7 @@ pub mod data
     use std::fs::File;
     use std::io::Write;
 
-    fn load(model: &mut model::Mapping) -> Result<Option<model::Mapping>, error::ApplicationError>
+    /*fn load(model: &mut model::Mapping) -> Result<Option<model::Mapping>, error::ApplicationError>
     {
         let json_data = fs::read_to_string(config::get_mapping_file()).map_err(error::ApplicationError::IoError)?;
         let m: model::Mapping = serde_json::from_str(&json_data).map_err(error::ApplicationError::JsonError)?;
@@ -24,5 +24,5 @@ pub mod data
         let mut file = File::create(config::get_mapping_file()).map_err(error::ApplicationError::IoError)?;
         file.write_all(json_data.as_bytes()).map_err(error::ApplicationError::IoError)?;
         Ok(())
-    }
+    }*/
 }
