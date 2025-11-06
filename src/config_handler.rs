@@ -45,8 +45,11 @@ pub mod config
             model.range2_high = 24999.0;
             model.range3_low = 25000.0;
             model.range3_high = 49999.0;
-            model.range4_low = 75000.0;
-            model.range4_high = 999999.0;
+            model.range4_low = 50000.0;
+            model.range4_high = 749999.0;
+            model.range5_low = 75000.0;
+            model.range5_high = 999999.0;
+            model.range6_low = 100000.0;
             save(model)?;
             println!("Configuration file does not exist yet, creating a default one at {:?}.", Path::new(config_file.as_path()));
         }

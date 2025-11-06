@@ -4,7 +4,6 @@
  */
 pub mod data 
 {
-    use crate::config_handler::config;
     use crate::error_handler::error;
     use crate::models::model;
     use std::fs;

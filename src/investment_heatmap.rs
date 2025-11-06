@@ -8,7 +8,6 @@ pub mod investment_heatmap
     use crate::consts::const_;
     use crate::models::model;
     use crate::error_handler::error;
-    use crate::config_handler::config;
     use std::env;
     use std::io::Write;
     use std::fs::File;
@@ -22,7 +21,7 @@ pub mod investment_heatmap
     const DAT_CONVERTED: &'static str = "investment_heatmap.dat";
 
     fn prepare_data(
-        config: model::Configuration,
+        aconfig: model::Configuration,
         mapping: model::Mapping,
         afile: &str,
         apricedb: &str,
@@ -71,13 +70,13 @@ pub mod investment_heatmap
         let path_converted_str = path_converted.to_str().unwrap();
 
         // TODO: pass config/mapping
-        convert_data(&path_raw_str)?;
+        convert_data(aconfig, &path_raw_str)?;
         println!("Wrote converted data to {}.", path_converted_str);
 
         Ok(())
     }
 
-    fn convert_data(afile: &str) -> Result<(), error::ApplicationError>
+    fn convert_data(aconfig: model::Configuration, afile: &str) -> Result<(), error::ApplicationError>
     {
         // TODO:
         // read file per line
@@ -110,22 +109,47 @@ pub mod investment_heatmap
         }
     }
 
-    fn map_value(avalue: f64) -> Result<i32, error::ApplicationError>
+    fn map_value(aconfig: model::Configuration, avalue: f64) -> Result<i32, error::ApplicationError>
     {
-        match avalue
+        let mut result: i32 = -1;
+        if avalue >= aconfig.range1_low && avalue <= aconfig.range1_high
         {
-            0.0..=9999.0 => Ok(0),
-            10000.0..=24999.0 => Ok(1),
-            25000.0..=49999.0 => Ok(2),
-            50000.0..=74999.0 => Ok(3),
-            75000.0..=99999.0 => Ok(4),
-            100000.0.. => Ok(5),
+            result = 0;
+        };
+        if avalue >= aconfig.range2_low && avalue <= aconfig.range2_high
+        {
+            result = 1;
+        };
+        if avalue >= aconfig.range3_low && avalue <= aconfig.range3_high
+        {
+            result = 2;
+        };
+        if avalue >= aconfig.range4_low && avalue <= aconfig.range4_high
+        {
+            result = 3;
+        };
+        if avalue >= aconfig.range5_low && avalue <= aconfig.range5_high
+        {
+            result = 4;
+        };
+        if avalue >= aconfig.range6_low
+        {
+            result = 5;
+        };
+        match result
+        {
+            0 => Ok(0),
+            1 => Ok(1),
+            2 => Ok(2),
+            3 => Ok(3),
+            4 => Ok(4),
+            5 => Ok(5),
             _ => Err(error::ApplicationError::ValueOutOfRangeError(avalue.to_string())),
         }
     }
 
     pub fn plot_data(
-        config: model::Configuration,
+        aconfig: model::Configuration,
         mapping: model::Mapping,
         afile: &str,
         apricedb: &str,
@@ -133,7 +157,7 @@ pub mod investment_heatmap
     ) -> Result<(), error::ApplicationError>
     {
         println!("debug :: {:?}", mapping);
-        prepare_data(config, mapping, afile, apricedb, aendyear)?;
+        prepare_data(aconfig, mapping, afile, apricedb, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
 
         Command::new("gnuplot")

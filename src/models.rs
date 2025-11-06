@@ -36,5 +36,8 @@ pub mod model
         pub range3_high: f64,
         pub range4_low: f64,
         pub range4_high: f64,
+        pub range5_low: f64,
+        pub range5_high: f64,
+        pub range6_low: f64,
     }
 }
