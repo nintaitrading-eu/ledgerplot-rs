@@ -5,10 +5,12 @@
 pub mod data 
 {
     use crate::error_handler::error;
-    use crate::models::model;
-    use std::fs;
+    //use crate::models::model;
+    //use std::fs;
     use std::fs::File;
-    use std::io::Write;
+    //use std::io::Write;
+    use std::io::{Lines,BufReader,BufRead};
+    use std::path::Path;
 
     /*fn load(model: &mut model::Mapping) -> Result<Option<model::Mapping>, error::ApplicationError>
     {
@@ -24,4 +26,11 @@ pub mod data
         file.write_all(json_data.as_bytes()).map_err(error::ApplicationError::IoError)?;
         Ok(())
     }*/
+
+    pub fn read_lines<F>(filename: F) -> Result<Lines<BufReader<File>>, error::ApplicationError>
+        where F: AsRef<Path>,
+    {
+        let file = File::open(filename)?;
+        Ok(BufReader::new(file).lines())
+    }
 }
