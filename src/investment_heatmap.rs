@@ -8,6 +8,8 @@ pub mod investment_heatmap
     use crate::consts::const_;
     use crate::models::model;
     use crate::error_handler::error;
+    //use crate::config_handler::config;
+    use crate::data_handler::data;
     use std::env;
     use std::io::{Write,BufReader,BufRead};
     use std::fs::File;
@@ -88,10 +90,20 @@ pub mod investment_heatmap
         // 
         // TODO: pass config to map_value
         let mut f = File::open(afile)?;
-        let mut reader  = BufReader::new(f);
-        let mut buffer = Vec::new();
-        reader.read_until(b'\n', &mut buffer)?;
-        println!("{} bytes: {}", buffer.len(), String::from_utf8_lossy(&buffer));
+        //let mut reader  = BufReader::new(f);
+        //let mut buffer = Vec::new();
+
+        if let Ok(lines) = data::read_lines(afile)
+        {
+            for line in lines.map_while(Result::ok)
+            {
+                if line.starts_with("---")
+                {
+                    continue;
+                }
+                println!("{}", line);
+            }
+        }
 
         Err(error::ApplicationError::ConversionError)
         //Ok(())
