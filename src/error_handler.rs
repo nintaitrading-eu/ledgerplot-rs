@@ -21,10 +21,10 @@ pub mod error
         #[error("Unexpected error.")]
         UnexpectedError,
 
-        #[error("Unknown asset {0}, check asset_mapping.json")]
+        #[error("Unknown asset {0}, check asset_mapping.json.")]
         UnknownAssetError(String),
 
-        #[error("Value out of range: {0}")]
+        #[error("Value out of range: {0}.")]
         ValueOutOfRangeError(String),
 
         #[error("Plotting failed.")]
