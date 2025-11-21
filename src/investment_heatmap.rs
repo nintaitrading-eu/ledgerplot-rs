@@ -9,7 +9,7 @@ pub mod investment_heatmap
     use crate::models::model;
     use crate::error_handler::error;
     use std::env;
-    use std::io::Write;
+    use std::io::{Write,BufReader,BufRead};
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
@@ -87,6 +87,12 @@ pub mod investment_heatmap
         //     map asset to account, to know in which col to write the value
         // 
         // TODO: pass config to map_value
+        let mut f = File::open(afile)?;
+        let mut reader  = BufReader::new(f);
+        let mut buffer = Vec::new();
+        reader.read_until(b'\n', &mut buffer)?;
+        println!("{} bytes: {}", buffer.len(), String::from_utf8_lossy(&buffer));
+
         Err(error::ApplicationError::ConversionError)
         //Ok(())
     }
