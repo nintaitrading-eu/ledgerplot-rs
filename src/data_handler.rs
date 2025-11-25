@@ -9,7 +9,7 @@ pub mod data
     //use std::fs;
     use std::fs::File;
     //use std::io::Write;
-    use std::io::{Lines,BufReader,BufRead};
+    use std::io::BufReader;
     use std::path::Path;
 
     /*fn load(model: &mut model::Mapping) -> Result<Option<model::Mapping>, error::ApplicationError>
@@ -27,10 +27,10 @@ pub mod data
         Ok(())
     }*/
 
-    pub fn read_lines<F>(filename: F) -> Result<Lines<BufReader<File>>, error::ApplicationError>
+    pub fn read_lines<F>(filename: F) -> Result<BufReader<File>, error::ApplicationError>
         where F: AsRef<Path>,
     {
         let file = File::open(filename)?;
-        Ok(BufReader::new(file).lines())
+        Ok(BufReader::new(file))
     }
 }

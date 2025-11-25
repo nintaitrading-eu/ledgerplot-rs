@@ -8,7 +8,6 @@ pub mod investment_heatmap
     use crate::consts::const_;
     use crate::models::model;
     use crate::error_handler::error;
-    //use crate::config_handler::config;
     use crate::data_handler::data;
     use std::env;
     use std::io::{Write,BufReader,BufRead};
@@ -21,6 +20,7 @@ pub mod investment_heatmap
         "%(format_date(date, \"%Y-%m-%d\")) %(roundto(scrub(display_amount), 2))\n";
     const DAT_RAW: &'static str = "investment_heatmap_raw.dat";
     const DAT_CONVERTED: &'static str = "investment_heatmap.dat";
+    const TOTAL_SEPARATOR: &'static str = "---";
 
     fn prepare_data(
         aconfig: model::Configuration,
@@ -90,23 +90,24 @@ pub mod investment_heatmap
         // 
         // TODO: pass config to map_value
         let mut f = File::open(afile)?;
-        //let mut reader  = BufReader::new(f);
-        //let mut buffer = Vec::new();
 
-        if let Ok(lines) = data::read_lines(afile)
+        let buffer = match data::read_lines(afile)
         {
-            for line in lines.map_while(Result::ok)
+            Ok(br) => br,
+            Err(e) => return Err(e),
+        };
+
+        for line in buffer.lines().map_while(Result::ok)
+        {
+            if line.starts_with(TOTAL_SEPARATOR)
             {
-                if line.starts_with("---")
-                {
-                    continue;
-                }
-                println!("{}", line);
+                break;
             }
+            let amounts: Vec<&str> = line.split(" ").collect();
+            println!("{} ({})", amounts[0], amounts[1]);
         }
 
-        Err(error::ApplicationError::ConversionError)
-        //Ok(())
+        Ok(())
     }
 
     fn map_asset_col_idx(asset: &str) -> Result<i32, error::ApplicationError>
