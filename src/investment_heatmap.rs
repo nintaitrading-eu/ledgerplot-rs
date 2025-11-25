@@ -103,7 +103,7 @@ pub mod investment_heatmap
             {
                 break;
             }
-            let amounts: Vec<&str> = line.split(" ").collect();
+            let amounts: Vec<&str> = line.trim().split(" ").collect();
             println!("{} ({})", amounts[0], amounts[1]);
         }
 
