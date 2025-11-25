@@ -156,12 +156,7 @@ pub mod investment_heatmap
         };
         match result
         {
-            0 => Ok(0),
-            1 => Ok(1),
-            2 => Ok(2),
-            3 => Ok(3),
-            4 => Ok(4),
-            5 => Ok(5),
+            n if n >= 0 && n <= 5 => Ok(n),
             _ => Err(error::ApplicationError::ValueOutOfRangeError(avalue.to_string())),
         }
     }
