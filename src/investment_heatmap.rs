@@ -60,14 +60,6 @@ pub mod investment_heatmap
         output_raw.write_all(&output1).map_err(error::ApplicationError::IoError)?;
         println!("Wrote data to {}.", path_raw_str);
 
-        // TODO: convert the lines in the file from
-        // 12.00 EUR assets:stock:xyz
-        // to
-        // assets:stock:xyz,0,1,0,0,0,0
-        // Also add the header:
-        // ,account01,account02,... (note empmty first col)
-        // Needs a mapper: asset name -> account (name + col idx)
-        // Needs a mapper: value range -> int value 1 - 5
         let path_converted: PathBuf = env::temp_dir().join(const_::TMPDIR).join(DAT_CONVERTED);
         let path_converted_str = path_converted.to_str().unwrap();
 
@@ -88,7 +80,14 @@ pub mod investment_heatmap
         //     set value of the asset in col 1
         //     map asset to account, to know in which col to write the value
         // 
-        // TODO: pass config to map_value
+        // TODO: convert the lines in the file from
+        // 12.00 EUR assets:stock:xyz
+        // to
+        // assets:stock:xyz,0,1,0,0,0,0
+        // Also add the header:
+        // ,account01,account02,... (note empmty first col)
+        // Needs a mapper: asset name -> account (name + col idx)
+        // Needs a mapper: value range -> int value 1 - 5
         let mut f = File::open(afile)?;
 
         let buffer = match data::read_lines(afile)
@@ -97,6 +96,8 @@ pub mod investment_heatmap
             Err(e) => return Err(e),
         };
 
+        // TODO: determine accounts (from mappings file?)
+        // TODO: save accounts in first line
         for line in buffer.lines().map_while(Result::ok)
         {
             if line.starts_with(TOTAL_SEPARATOR)
