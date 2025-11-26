@@ -105,6 +105,11 @@ pub mod investment_heatmap
             }
             let amounts: Vec<&str> = line.trim().split(" ").collect();
             println!("{} ({})", amounts[0], amounts[1]);
+            let amount_as_f32 = match amounts[0].parse::<f32>()
+            {
+                Ok(amt) => println!("Converted amount: {:.2}", amt),
+                Err(e) => println!("Conversion failed: {}", e.to_string()),
+            };
         }
 
         Ok(())
