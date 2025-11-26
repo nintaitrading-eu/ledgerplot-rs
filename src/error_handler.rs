@@ -32,6 +32,9 @@ pub mod error
 
         #[error("Conversion failed.")]
         ConversionError,
+
+        #[error("Parsing error: {0}.")]
+        ParsingError(String),
     }
 
     // Implement From for converting serde_json::Error to ApplicationError

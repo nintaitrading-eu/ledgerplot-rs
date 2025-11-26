@@ -10,7 +10,7 @@ pub mod investment_heatmap
     use crate::error_handler::error;
     use crate::data_handler::data;
     use std::env;
-    use std::io::{Write,BufReader,BufRead};
+    use std::io::{Write,BufRead};
     use std::fs::File;
     use std::path::PathBuf;
     use std::process::Command;
@@ -105,10 +105,15 @@ pub mod investment_heatmap
             }
             let amounts: Vec<&str> = line.trim().split(" ").collect();
             println!("{} ({})", amounts[0], amounts[1]);
-            let amount_as_f32 = match amounts[0].parse::<f32>()
+            let amount_as_f64 = match amounts[0].parse::<f64>()
             {
-                Ok(amt) => println!("Converted amount: {:.2}", amt),
-                Err(e) => println!("Conversion failed: {}", e.to_string()),
+                Ok(amt) => amt,
+                Err(e) => return Err(error::ApplicationError::ParsingError(e.to_string())),
+            };
+            let mapped_value = match map_value(&aconfig, amount_as_f64)
+            {
+                Ok(val) => println!("Mapped value: {}", val),
+                Err(e) => println!("Mapping of value failed: {}", e.to_string()),
             };
         }
 
@@ -133,7 +138,7 @@ pub mod investment_heatmap
         }
     }
 
-    fn map_value(aconfig: model::Configuration, avalue: f64) -> Result<i32, error::ApplicationError>
+    fn map_value(aconfig: &model::Configuration, avalue: f64) -> Result<i32, error::ApplicationError>
     {
         let mut result: i32 = -1;
         if avalue >= aconfig.range1_low && avalue <= aconfig.range1_high
