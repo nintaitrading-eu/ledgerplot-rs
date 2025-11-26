@@ -24,7 +24,7 @@ pub mod investment_heatmap
 
     fn prepare_data(
         aconfig: model::Configuration,
-        mapping: model::Mapping,
+        amapping: model::Mapping,
         afile: &str,
         apricedb: &str,
         aendyear: i32
@@ -64,13 +64,13 @@ pub mod investment_heatmap
         let path_converted_str = path_converted.to_str().unwrap();
 
         // TODO: pass config/mapping
-        convert_data(aconfig, &path_raw_str)?;
+        convert_data(aconfig, amapping, &path_raw_str)?;
         println!("Wrote converted data to {}.", path_converted_str);
 
         Ok(())
     }
 
-    fn convert_data(aconfig: model::Configuration, afile: &str) -> Result<(), error::ApplicationError>
+    fn convert_data(aconfig: model::Configuration, amapping: model::Mapping, afile: &str) -> Result<(), error::ApplicationError>
     {
         // TODO:
         // read file per line
@@ -97,6 +97,17 @@ pub mod investment_heatmap
         };
 
         // TODO: determine accounts (from mappings file?)
+        let mut line_accounts: String = Default::default();
+        for (index, account) in amapping.records.iter().enumerate()
+        {
+            line_accounts.push_str(format!(",{}", account.name).as_str());
+            println!("Mapping record: {} {}", index, account.name);
+        }
+        println!("Constructed header: {}", line_accounts);
+        // TODO: create appender to append a new line to a file.
+        //       Call this one for the header with accounts that was created.
+
+        // TODO: check account names
         // TODO: save accounts in first line
         for line in buffer.lines().map_while(Result::ok)
         {
@@ -175,14 +186,13 @@ pub mod investment_heatmap
 
     pub fn plot_data(
         aconfig: model::Configuration,
-        mapping: model::Mapping,
+        amapping: model::Mapping,
         afile: &str,
         apricedb: &str,
         aendyear: i32
     ) -> Result<(), error::ApplicationError>
     {
-        println!("debug :: {:?}", mapping);
-        prepare_data(aconfig, mapping, afile, apricedb, aendyear)?;
+        prepare_data(aconfig, amapping, afile, apricedb, aendyear)?;
         println!("Data for {:?} prepared.", plot::PlotType::InvestmentHeatmap);
 
         Command::new("gnuplot")
