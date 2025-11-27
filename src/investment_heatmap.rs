@@ -115,8 +115,8 @@ pub mod investment_heatmap
             {
                 break;
             }
-            let amounts: Vec<&str> = line.trim().split(" ").collect();
-            println!("{} ({})", amounts[0], amounts[1]);
+            let amounts: Vec<&str> = line.trim().split_whitespace().collect();
+            println!("debug:: {} {} {}", amounts[0], amounts[1], amounts[2]);
             let amount_as_f64 = match amounts[0].parse::<f64>()
             {
                 Ok(amt) => amt,
