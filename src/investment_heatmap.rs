@@ -60,18 +60,17 @@ pub mod investment_heatmap
         output_raw.write_all(&output1).map_err(error::ApplicationError::IoError)?;
         println!("Wrote data to {}.", path_raw_str);
 
-        let path_converted: PathBuf = env::temp_dir().join(const_::TMPDIR).join(DAT_CONVERTED);
-        let path_converted_str = path_converted.to_str().unwrap();
-
         // TODO: pass config/mapping
         convert_data(aconfig, amapping, &path_raw_str)?;
-        println!("Wrote converted data to {}.", path_converted_str);
 
         Ok(())
     }
 
     fn convert_data(aconfig: model::Configuration, amapping: model::Mapping, afile: &str) -> Result<(), error::ApplicationError>
     {
+        let path_converted: PathBuf = env::temp_dir().join(const_::TMPDIR).join(DAT_CONVERTED);
+        let path_converted_str = path_converted.to_str().unwrap();
+
         // TODO:
         // read file per line
         // first line: accounts
@@ -104,6 +103,7 @@ pub mod investment_heatmap
             println!("Mapping record: {} {}", index, account.name);
         }
         println!("Constructed header: {}", line_accounts);
+        let _ = data::append(line_accounts.as_str(), path_converted_str);
         // TODO: create appender to append a new line to a file.
         //       Call this one for the header with accounts that was created.
 
@@ -128,6 +128,8 @@ pub mod investment_heatmap
                 Err(e) => println!("Mapping of value failed: {}", e.to_string()),
             };
         }
+
+        println!("Wrote converted data to {}.", path_converted_str);
 
         Ok(())
     }
