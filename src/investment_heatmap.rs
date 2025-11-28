@@ -95,14 +95,18 @@ pub mod investment_heatmap
         };
 
         let mut line_accounts: String = Default::default();
+        let mut number_of_accounts: i32 = 0;
         for (index, account) in amapping.records.iter().enumerate()
         {
             line_accounts.push_str(format!(",{}", account.name).as_str());
+            number_of_accounts = number_of_accounts + 1;
         }
+        line_accounts.push_str("\n");
         let _ = data::append(line_accounts.as_str(), path_converted_str)?;
 
-        // TODO: check account names
-        // TODO: save accounts in first line
+        // TODO: assets are per account
+        // assets:stock:xyz,0,1,0,0,0,0
+        let mut line_asset: String = Default::default();
         for line in buffer.lines().map_while(Result::ok)
         {
             if line.starts_with(TOTAL_SEPARATOR)
@@ -120,6 +124,20 @@ pub mod investment_heatmap
                 Ok(val) => val,
                 Err(e) => return Err(error::ApplicationError::MappingError(e.to_string())),
             };
+            // TODO: make string dynamic, based on number_of_accounts?
+            line_asset.push_str(format!("{}", amounts[2]).as_str());
+            for account_idx in 1 .. number_of_accounts
+            {
+                // TODO: add val if map_col_idx is equal to account_idx + 1
+                let v = match map_asset_col_idx(amounts[2])
+                {
+                    Ok(val) => val,
+                    Err(e) => return Err(error::ApplicationError::MappingError(e.to_string())),
+                };
+                line_asset.push_str(format!(",{}", v).as_str());
+            }
+            line_asset.push_str("\n");
+            let _ = data::append(line_asset.as_str(), path_converted_str)?;
         }
 
         println!("Wrote converted data to {}.", path_converted_str);
@@ -139,6 +157,9 @@ pub mod investment_heatmap
         match asset
         {
             "assets:asset1" => Ok(1),
+            "assets:stock:mystock" => Ok(1),
+            "assets:stock:mystock2" => Ok(2),
+            "assets:stock:mystock3" => Ok(3),
             "assets:asset2" => Ok(2),
             "assets:asset3" => Ok(3),
             _ => Err(error::ApplicationError::UnknownAssetError(asset.to_string())),
