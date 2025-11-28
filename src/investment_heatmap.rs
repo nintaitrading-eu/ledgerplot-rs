@@ -134,7 +134,14 @@ pub mod investment_heatmap
                     Ok(val) => val,
                     Err(e) => return Err(error::ApplicationError::MappingError(e.to_string())),
                 };
-                line_asset.push_str(format!(",{}", v).as_str());
+                if v == account_idx
+                {
+                    line_asset.push_str(format!(",{}", v).as_str())
+                }
+                else
+                {
+                    line_asset.push_str(",0")
+                };
             }
             line_asset.push_str("\n");
             let _ = data::append(line_asset.as_str(), path_converted_str)?;
