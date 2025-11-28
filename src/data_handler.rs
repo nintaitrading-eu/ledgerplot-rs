@@ -18,14 +18,11 @@ pub mod data
 
     pub fn append(data: &str, filepath: &str) -> Result<(), error::ApplicationError>
     {
-        // TODO: Create if it does not exist.
-        println!("In append(), data = [{:?}], file = [{}].", data.as_bytes(), filepath);
         let mut file = OpenOptions::new()
+            .create(true)
             .append(true)
             .open(filepath).map_err(error::ApplicationError::IoError)?;
-        println!("file {} opened", filepath);
         file.write_all(data.as_bytes()).map_err(error::ApplicationError::IoError)?;
-        println!("Data {:?} written.", data.as_bytes());
         Ok(())
     }
 }

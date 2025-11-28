@@ -35,6 +35,9 @@ pub mod error
 
         #[error("Parsing error: {0}.")]
         ParsingError(String),
+
+        #[error("Mapping error: {0}.")]
+        MappingError(String),
     }
 
     // Implement From for converting serde_json::Error to ApplicationError

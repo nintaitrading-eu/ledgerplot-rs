@@ -60,7 +60,6 @@ pub mod investment_heatmap
         output_raw.write_all(&output1).map_err(error::ApplicationError::IoError)?;
         println!("Wrote data to {}.", path_raw_str);
 
-        // TODO: pass config/mapping
         convert_data(aconfig, amapping, &path_raw_str)?;
 
         Ok(())
@@ -95,17 +94,12 @@ pub mod investment_heatmap
             Err(e) => return Err(e),
         };
 
-        // TODO: determine accounts (from mappings file?)
         let mut line_accounts: String = Default::default();
         for (index, account) in amapping.records.iter().enumerate()
         {
             line_accounts.push_str(format!(",{}", account.name).as_str());
-            println!("Mapping record: {} {}", index, account.name);
         }
-        println!("Constructed header: {}", line_accounts);
-        let _ = data::append(line_accounts.as_str(), path_converted_str);
-        // TODO: create appender to append a new line to a file.
-        //       Call this one for the header with accounts that was created.
+        let _ = data::append(line_accounts.as_str(), path_converted_str)?;
 
         // TODO: check account names
         // TODO: save accounts in first line
@@ -116,7 +110,6 @@ pub mod investment_heatmap
                 break;
             }
             let amounts: Vec<&str> = line.trim().split_whitespace().collect();
-            println!("debug:: {} {} {}", amounts[0], amounts[1], amounts[2]);
             let amount_as_f64 = match amounts[0].parse::<f64>()
             {
                 Ok(amt) => amt,
@@ -124,8 +117,8 @@ pub mod investment_heatmap
             };
             let mapped_value = match map_value(&aconfig, amount_as_f64)
             {
-                Ok(val) => println!("Mapped value: {}", val),
-                Err(e) => println!("Mapping of value failed: {}", e.to_string()),
+                Ok(val) => val,
+                Err(e) => return Err(error::ApplicationError::MappingError(e.to_string())),
             };
         }
 
